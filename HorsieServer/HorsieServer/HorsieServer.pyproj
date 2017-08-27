@@ -45,7 +45,6 @@
     <Folder Include="HorsieServer\static\" />
     <Folder Include="HorsieServer\static\content\" />
     <Folder Include="HorsieServer\static\fonts\" />
-    <Folder Include="HorsieServer\static\scripts\" />
     <Folder Include="HorsieServer\templates\" />
   </ItemGroup>
   <ItemGroup>
@@ -56,21 +55,6 @@
     <Content Include="HorsieServer\static\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="HorsieServer\static\fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="HorsieServer\static\fonts\glyphicons-halflings-regular.woff" />
-    <Content Include="HorsieServer\static\scripts\bootstrap.js" />
-    <Content Include="HorsieServer\static\scripts\bootstrap.min.js" />
-    <Content Include="HorsieServer\static\scripts\jquery-1.10.2.intellisense.js" />
-    <Content Include="HorsieServer\static\scripts\jquery-1.10.2.js" />
-    <Content Include="HorsieServer\static\scripts\jquery-1.10.2.min.js" />
-    <Content Include="HorsieServer\static\scripts\jquery-1.10.2.min.map" />
-    <Content Include="HorsieServer\static\scripts\jquery.validate-vsdoc.js" />
-    <Content Include="HorsieServer\static\scripts\jquery.validate.js" />
-    <Content Include="HorsieServer\static\scripts\jquery.validate.min.js" />
-    <Content Include="HorsieServer\static\scripts\jquery.validate.unobtrusive.js" />
-    <Content Include="HorsieServer\static\scripts\jquery.validate.unobtrusive.min.js" />
-    <Content Include="HorsieServer\static\scripts\modernizr-2.6.2.js" />
-    <Content Include="HorsieServer\static\scripts\respond.js" />
-    <Content Include="HorsieServer\static\scripts\respond.min.js" />
-    <Content Include="HorsieServer\static\scripts\_references.js" />
     <Content Include="HorsieServer\templates\index.html" />
     <Content Include="HorsieServer\templates\layout.html" />
   </ItemGroup>

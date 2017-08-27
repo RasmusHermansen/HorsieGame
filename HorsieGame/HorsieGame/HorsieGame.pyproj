@@ -5,8 +5,7 @@
     <ProjectGuid>1d7662ad-6d20-4a66-ba8a-a8e91ec3a203</ProjectGuid>
     <ProjectHome>.</ProjectHome>
     <StartupFile>HorsieGame.py</StartupFile>
-    <SearchPath>
-    </SearchPath>
+    <SearchPath>..\..\HorsieServer\HorsieServer</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>HorsieGame</Name>
@@ -21,7 +20,17 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Databinding\Connection.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Databinding\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="HorsieGame.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Databinding\" />
+    <Folder Include="Databinding\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
