@@ -10,15 +10,5 @@ Schema_Path = 'E:\Horsie\HorsieServer\HorsieServer\HorsieServer\schema.sql'
 schema = open(Schema_Path).read()
 db.cursor().executescript(schema)
 
-# Insert Dev session
-db.execute('INSERT INTO Sessions (SessionName, IsActive, Created) VALUES (?,?,?)', 
-	["Dev1",1,datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")])
-
-# Insert session horses
-db.execute('INSERT INTO Horses (SessionId, Name, Speed) VALUES (?,?,?)', 
-	[1,"Tarok",5.2]),
-db.execute('INSERT INTO Horses (SessionId, Name, Speed) VALUES (?,?,?)', 
-	[1,"Muhammad",4.8])
-
 db.commit()
 db.close()

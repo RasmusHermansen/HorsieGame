@@ -2,6 +2,7 @@ drop table if exists Sessions;
 create table Sessions (
   id INTEGER primary key autoincrement,
   SessionName TEXT not null,
+  SessionKey TEXT not null,
   IsActive INTEGER not null,
   Created TEXT  not null,
   Closed TEXT 

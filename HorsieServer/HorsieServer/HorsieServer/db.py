@@ -44,3 +44,9 @@ def ActiveSessionIdFromSessionName(sessionName):
     if(res == None):
         return -1
     return res['id']
+
+def CorrectSessionKey(sessionId, sessionKey):
+    res = get_db().cursor().execute('SELECT SessionKey FROM Sessions WHERE id=?',[sessionId]).fetchone()
+    if(res == None or res['SessionKey'] != sessionKey):
+        return False
+    return True

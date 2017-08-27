@@ -1,6 +1,6 @@
 from HorsieServer.Setup import app, request, abort
 import HorsieServer.db as database
-import datetime, random
+import datetime, random, string
 from flask import jsonify
 
 # TODO:
@@ -22,23 +22,26 @@ def CreateSession():
         if(sessId == -1):
             break
 
+    # Generate key
+    sessionKey = "".join(random.choices(string.ascii_letters + string.digits,k=16))
 
     # Create Session
     db = database.get_db()
-    db.execute('INSERT INTO Sessions (SessionName, IsActive, Created) VALUES (?,1,?)', 
-	                    [sessionName,datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")])
+    db.execute('INSERT INTO Sessions (SessionName, SessionKey, IsActive, Created) VALUES (?,?,1,?)', 
+	                    [sessionName,sessionKey,datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")])
     db.commit()
     # Get new sessionId
-    return jsonify({'sessionName': sessionName, 'uniqueId': database.ActiveSessionIdFromSessionName(sessionName)})
+    return jsonify({'sessionName': sessionName, 'uniqueId': database.ActiveSessionIdFromSessionName(sessionName), 'sessionKey':sessionKey})
 
 
 @app.route('/Game/api/v1.0/CloseSession', methods=['GET','POST'])
 def CloseSession():
     if not request.json:
         abort(400)
-    sessId = request.json['SessionId']
-    # Check if it is active
-    if(database.SessionActive(sessId)):
+    sessId = request.json['sessionId']
+    sessKey = request.json['sessionKey']
+    # Check if it is active and correct key
+    if(database.SessionActive(sessId) and database.CorrectSessionKey(sessId, sessKey)):
         # Close Session
         db = database.get_db()
         db.execute('UPDATE Sessions SET IsActive = 0, Closed = ? WHERE id=?', 
