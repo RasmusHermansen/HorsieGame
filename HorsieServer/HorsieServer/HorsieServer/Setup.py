@@ -14,3 +14,4 @@ app.config.update(dict(
 
 import HorsieServer.db as db
 import HorsieServer.views
+import HorsieServer.api

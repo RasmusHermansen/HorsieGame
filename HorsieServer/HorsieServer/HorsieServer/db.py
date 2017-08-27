@@ -32,3 +32,15 @@ def initdb_command():
     """Initializes the database."""
     init_db()
     print('Initialized the database.')
+
+def SessionActive(sessionId):
+    res = get_db().cursor().execute('SELECT IsActive FROM Sessions WHERE id=?',[sessionId]).fetchone()
+    if(res == None):
+        return False
+    return res['IsActive'] == 1
+
+def ActiveSessionIdFromSessionName(sessionName):
+    res = get_db().cursor().execute('SELECT id FROM Sessions WHERE SessionName=? AND IsActive=?',[sessionName,1]).fetchone()
+    if(res == None):
+        return -1
+    return res['id']
