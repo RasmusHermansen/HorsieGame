@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-4" />
+        <div class="col-md-4">
+            <div class="wrap">
+                <div class="login-Wrap">
+                    <p class="form-title">
+                        Horsiegame Pruuh
+                    </p>
+                    <form class="login" action="{{ url_for('login') }}" method=post>
+                        <input type="text" name="SessionId" placeholder="SessionId" autocomplete="off"/>
+                        <input type="text" name="Alias" placeholder="Alias" autocomplete="off"/>
+                        <input type="submit" value="Enter" class="btn btn-success btn-sm" />
+                        {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
