@@ -5,15 +5,15 @@ from flask import jsonify
 
 # TODO:
 # REMOVE GET from methods for entire api
-# Make key related to session (no troll)
 
 @app.route('/Game/api/v1.0/CreateSession', methods=['GET','POST'])
 def CreateSession():
     #replace sessionNames with valid generator
-    sessionNames = ("Memes", "Krugge412", "BaNAn2", "test21241", "temp1213", "wololo2")
+    sessionNames = ("Memes", "Krugge", "BaNAn", "wololo", "brikken", "kony")
     
     sessionName = ""
     # Iterate new SessionNames untill valid
+    counter = 0;
     while True:
         # Create SessionName
         sessionName = random.choice(sessionNames)
@@ -21,6 +21,11 @@ def CreateSession():
         sessId = database.ActiveSessionIdFromSessionName(sessionName)
         if(sessId == -1):
             break
+        # SessionName iterations
+        counter += 1
+        # Cleanup activeSessions
+        if(counter > 25):
+            raise RecursionError("Unable to create new unique active session, check if IsActive for all sessNames")
 
     # Generate key
     sessionKey = "".join(random.choices(string.ascii_letters + string.digits,k=16))

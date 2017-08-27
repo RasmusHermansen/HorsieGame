@@ -5,8 +5,9 @@ from Databinding.Querier import Querier
 conn = Querier(ServerConnection('Local'))
 print("GameName:" + conn.InstantiateNewSession())
 try:
-    print("What up")
-    
+
+    input("Interact as client, press enter (in terminal) to close session...")
+
     # Close Sessions
     conn.CloseSession()
 except:
