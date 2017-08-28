@@ -33,7 +33,7 @@
     <Compile Include="HorsieServer\db.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="HorsieServer\templates\GameInfo.html">
+    <Compile Include="HorsieServer\templates\Game.html">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="HorsieServer\views.py">
@@ -48,6 +48,7 @@
     <Folder Include="HorsieServer\static\" />
     <Folder Include="HorsieServer\static\content\" />
     <Folder Include="HorsieServer\static\fonts\" />
+    <Folder Include="HorsieServer\static\Scripts\" />
     <Folder Include="HorsieServer\templates\" />
   </ItemGroup>
   <ItemGroup>
@@ -58,6 +59,8 @@
     <Content Include="HorsieServer\static\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="HorsieServer\static\fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="HorsieServer\static\fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="HorsieServer\static\Scripts\Game.js" />
+    <Content Include="HorsieServer\static\Scripts\GameInfoToggle.js" />
     <Content Include="HorsieServer\templates\index.html" />
     <Content Include="HorsieServer\templates\layout.html" />
   </ItemGroup>

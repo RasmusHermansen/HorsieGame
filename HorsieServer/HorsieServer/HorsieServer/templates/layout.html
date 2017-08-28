@@ -1,10 +1,13 @@
 ﻿<!doctype html>
 <title>HorsieGame</title>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='content/style.css') }}">
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='content/bootstrap.min.css') }}">
-<div class=page>
-    {% for message in get_flashed_messages() %}
-    <div class=flash>{{ message }}</div>
-    {% endfor %}
-    {% block body %}{% endblock %}
-</div>
+<body>
+    <div class=page>
+        {% for message in get_flashed_messages() %}
+        <div class=flash>{{ message }}</div>
+        {% endfor %}
+        {% block body %}{% endblock %}
+    </div>
+</body>

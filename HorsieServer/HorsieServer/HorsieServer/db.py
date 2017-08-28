@@ -50,3 +50,9 @@ def CorrectSessionKey(sessionId, sessionKey):
     if(res == None or res['SessionKey'] != sessionKey):
         return False
     return True
+
+def AllowUserToEnterActiveSession(sessionId, alias, userKey):
+    res = get_db().cursor().execute('SELECT UserKey, IsActive FROM Users WHERE SessionId=? AND Alias=?',[sessionId,alias]).fetchone()
+    if(res == None or res['IsActive'] == 0 or res['userKey'] == userKey):
+        return True
+    return False

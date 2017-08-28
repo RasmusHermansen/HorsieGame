@@ -6,7 +6,7 @@ conn = Querier(ServerConnection('Local'))
 print("GameName:" + conn.InstantiateNewSession())
 try:
 
-    input("Interact as client, press enter (in terminal) to close session...")
+    input("Interact as client, press enter (in terminal) to close session...\n")
 
     # Close Sessions
     conn.CloseSession()

@@ -54,3 +54,19 @@ def CloseSession():
         db.commit()
 
     return jsonify({'Closed': True})
+
+@app.route('/Game/api/v1.0/GetAllBets', methods=['GET','POST'])
+def GetAllBets():
+    if not request.json:
+        abort(400)
+    sessId = request.json['sessionId']
+    sessKey = request.json['sessionKey']
+    sessRun = request.json['sessionRun']
+    # Check if it is active and correct key
+    if(not database.SessionActive(sessId) or not database.CorrectSessionKey(sessId, sessKey)):
+        raise ConnectionRefusedError("Inactive sessionId or invalid sessionKey")
+    # Make query
+    db = database.get_db()
+    bets = db.cursor().execute('SELECT ActionId FROM Actions WHERE SessionId=?',[session['SessionId']]).fetchall()
+
+    return jsonify({'Closed': True})

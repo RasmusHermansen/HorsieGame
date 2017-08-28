@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+{% block body %}
+<script type=text/javascript src="{{ url_for('static', filename='Scripts/Game.js') }}"></script>
+<script type=text/javascript src="{{ url_for('static', filename='Scripts/GameInfoToggle.js') }}"></script>
+
+<button id="GameInfoToggleBtn" style="float:left" type="button">ToggleGameInfo</button> 
+<div class="container gameContainer">
+    <div class="row">
+        <div class="col-md-6">
+            <h1>Place Bet</h1>
+        </div>
+    </div>
+</div>
+
+<!--DEV GAMEINFO TOGGLE-->
+<div class="container gameContainer" style="display:none">
+    <div class="row shadedAndWhite">
+        <div class="col-md-6">
+            <h1>From table Users:</h1>
+            <ul>
+                {% for entry in tbUsers %}
+                <li>
+                    <strong>Alias:</strong>{{ entry.Alias }}<br /><strong>Standing:</strong>{{ entry.Standing }}
+                {% else %}
+                <li>
+                    <em>No Users given the current session id: {{ session.SessionId }}</em>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="col-md-6">
+            <h1>From table Horses</h1>
+            <ul>
+                {% for entry in tbHorses %}
+                <li>
+                    <strong>Name:</strong>{{ entry.Name }}<br /><strong>Speed:</strong>{{ entry.Speed }}
+                {% else %}
+                <li>
+                    <em>No Horses given the current session id: {{ session.SessionId }}</em>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+<!--DEV END-->
+{% endblock %}
