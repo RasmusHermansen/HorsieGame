@@ -23,6 +23,9 @@
     <Compile Include="Databinding\Connection.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="GameSettings.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Databinding\Querier.py">
       <SubType>Code</SubType>
     </Compile>
@@ -30,6 +33,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="HorsieGame.py" />
+    <Compile Include="TheGame.py">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Databinding\" />

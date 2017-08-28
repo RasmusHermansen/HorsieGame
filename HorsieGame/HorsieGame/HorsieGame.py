@@ -1,15 +1,18 @@
-from Databinding.Connection import ServerConnection
-from Databinding.Querier import Querier
+import GameSettings as cfg, sys, TheGame
+from PyQt5.QtWidgets import QApplication
 
-## start Connection ##
-conn = Querier(ServerConnection('Local'))
-print("GameName:" + conn.InstantiateNewSession())
-try:
+settings = cfg.GameSettings(
+            URL = "Local",
+            DEBUG = (1 if __name__ == '__main__' else 0)
+            )
 
-    input("Interact as client, press enter (in terminal) to close session...\n")
+# Init Qt
+app = QApplication(sys.argv)
 
-    # Close Sessions
-    conn.CloseSession()
-except:
-    conn.CloseSession()
-    
+# Start the game
+Game = TheGame.Game(settings)
+
+
+
+# Cleanup
+sys.exit(app.exec_())
