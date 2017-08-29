@@ -8,5 +8,5 @@ class Horse(VisualObject):
 
         # find fucking png
         png = ""
-
+            
         super().__init__(x,y,png)
