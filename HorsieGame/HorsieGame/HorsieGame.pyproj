@@ -23,6 +23,15 @@
     <Compile Include="Databinding\Connection.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Entities\Horse.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Entities\VisualObject.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Entities\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="GameSettings.py">
       <SubType>Code</SubType>
     </Compile>
@@ -40,6 +49,8 @@
   <ItemGroup>
     <Folder Include="Databinding\" />
     <Folder Include="Databinding\" />
+    <Folder Include="Entities\" />
+    <Folder Include="Entities\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
