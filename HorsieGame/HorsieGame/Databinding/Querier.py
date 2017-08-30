@@ -18,6 +18,11 @@ class Querier():
         self._sessId = data['uniqueId']
         return data['sessionName']
 
+    def SetHorseCount(self,count):
+        assert self.IsInstantiated(), "Query attempted without an instantiated session"
+        r = self.conn.PostRequest("SetHorses", {'sessionId':self._sessId,'sessionKey':self._sessKey,'horsesCount':count})
+        return r.json()
+
     def CloseSession(self):
         assert self.IsInstantiated(), "Query attempted without an instantiated session"
         self.conn.PostRequest("CloseSession", {'sessionId':self._sessId,'sessionKey':self._sessKey})

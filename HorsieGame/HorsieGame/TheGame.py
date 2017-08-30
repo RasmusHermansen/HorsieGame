@@ -31,18 +31,37 @@ class Game(QMainWindow):
     def InitConnection(self):
         # Set loading widget
         self.setCentralWidget(self.LoadingWidget.getWidget())
-        self.worker = RunThread(self._InitConnection,self.SetToMenu)
+        self.worker = RunThread(self._InitConnection,self._InitConnectionCB)
 
     def SetToMenu(self):
         # Initialize menu widget and set to central widget
-        self.MenuWidget = MenuScreen.Ui_QtMenuScreen()
+        self.MenuWidget = MenuScreen.Ui_QtMenuScreen(self.AddOrRemoveHorses)
+        self.MenuWidget.SetGameName(self.GameName)
         self.setCentralWidget(self.MenuWidget.getWidget())
+
+    def AddOrRemoveHorses(self, count):
+        if(not hasattr(self,"Horses")):
+            self.Horses = []
+
+        if (len(self.Horses) == count):
+            return
+        else:
+            self.app.processEvents()
+            self.Horses = self.conn.SetHorseCount(count)['Horses']
+            header = list(self.Horses[0].keys())
+            data = [list(x.values()) for x in self.Horses]
+            self.MenuWidget.SetHorses(data, header)
+
+    def _InitConnectionCB(self, _InitConnectionResults):
+        self.conn = _InitConnectionResults[0]
+        self.GameName = _InitConnectionResults[1]
+        self.SetToMenu()
 
     def _InitConnection(self):
         self.LoadingWidget.ChangeStatus("Establishing connection to server")
-        self.conn = Querier(ServerConnection(self.Settings.URL))
+        conn = Querier(ServerConnection(self.Settings.URL))
         self.LoadingWidget.ChangeStatus("Instantiating new session")
-        self.GameName = self.conn.InstantiateNewSession()
+        return conn, conn.InstantiateNewSession()
 
     def __InitMainWindow(self, settings):
         # Set size
@@ -67,7 +86,7 @@ class RunThread(QThread):
     Uses a pyqtSignal to alert the main thread of completion.
 
     """
-    finished = pyqtSignal(["QString"], [int])
+    finished = pyqtSignal([object], [int])
 
     def __init__(self, func, on_finish, *args, **kwargs):
         super(RunThread, self).__init__()
@@ -88,4 +107,4 @@ class RunThread(QThread):
             if isinstance(result, int):
                 self.finished[int].emit(result)
             else:
-                self.finished.emit(str(result)) # Force it to be a string by default.
+                self.finished.emit(result)

@@ -39,14 +39,18 @@ def CreateSession():
     return jsonify({'sessionName': sessionName, 'uniqueId': database.ActiveSessionIdFromSessionName(sessionName), 'sessionKey':sessionKey})
 
 
-@app.route('/Game/api/v1.0/CloseSession', methods=['GET','POST'])
-def CloseSession():
+def _ValidRequest(request):
+    """ Ensures request is Json, session is active and the correct session key is supplied"""
     if not request.json:
         abort(400)
     sessId = request.json['sessionId']
     sessKey = request.json['sessionKey']
     # Check if it is active and correct key
-    if(database.SessionActive(sessId) and database.CorrectSessionKey(sessId, sessKey)):
+    return database.SessionActive(sessId) and database.CorrectSessionKey(sessId, sessKey)
+
+@app.route('/Game/api/v1.0/CloseSession', methods=['GET','POST'])
+def CloseSession():
+    if(_ValidRequest(request)):
         # Close Session
         db = database.get_db()
         db.execute('UPDATE Sessions SET IsActive = 0, Closed = ? WHERE id=?', 
@@ -55,8 +59,32 @@ def CloseSession():
 
     return jsonify({'Closed': True})
 
+@app.route('/Game/api/v1.0/SetHorses', methods=['GET','POST'])
+def SetHorses():
+    if(_ValidRequest(request)):
+        desiredHorses = request.json['horsesCount']
+        # Init db
+        db = database.get_db()
+        # Get count of horses
+        numberHorses = db.cursor().execute('SELECT COUNT(*) FROM Horses Where SessionId=?',[request.json['sessionId']]).fetchone()[0]
+        # add or remove horses
+        if(numberHorses > desiredHorses):
+            db.execute('DELETE FROM Horses WHERE id IN (SELECT id FROM Horses WHERE SessionId=? LIMIT ?)',[request.json['sessionId'],numberHorses-desiredHorses])
+            db.commit()
+        elif(numberHorses < desiredHorses):
+            horseNames = ("Tarok", "Tarok1", "TArok2", "Mustafa", "Donkey", "1949", "DenSorteDød", "HvorDuFra")
+            for i in range(0,desiredHorses - numberHorses):
+                db.execute('INSERT INTO Horses (SessionId, Name, Speed) VALUES (?,?,?)', 
+	                            [request.json['sessionId'],random.choice(horseNames),random.randint(0,10)])
+                db.commit()
+        # Get horses
+        tbl_Horses = db.cursor().execute('SELECT Name, Speed FROM Horses Where SessionId=?',[request.json['sessionId']]).fetchall()
+        
+        return jsonify({'Horses':[dict(x) for x in tbl_Horses]})
+
 @app.route('/Game/api/v1.0/GetAllBets', methods=['GET','POST'])
 def GetAllBets():
+    raise NotImplementedError()
     if not request.json:
         abort(400)
     sessId = request.json['sessionId']
