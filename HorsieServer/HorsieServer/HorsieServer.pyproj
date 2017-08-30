@@ -46,15 +46,15 @@
   <ItemGroup>
     <Folder Include="HorsieServer\" />
     <Folder Include="HorsieServer\static\" />
-    <Folder Include="HorsieServer\static\content\" />
+    <Folder Include="HorsieServer\static\css\" />
     <Folder Include="HorsieServer\static\fonts\" />
     <Folder Include="HorsieServer\static\Scripts\" />
     <Folder Include="HorsieServer\templates\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="HorsieServer\static\content\bootstrap.css" />
-    <Content Include="HorsieServer\static\content\bootstrap.min.css" />
-    <Content Include="HorsieServer\static\content\style.css" />
+    <Content Include="HorsieServer\static\css\style.css">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="HorsieServer\static\fonts\glyphicons-halflings-regular.eot" />
     <Content Include="HorsieServer\static\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="HorsieServer\static\fonts\glyphicons-halflings-regular.ttf" />

@@ -42,13 +42,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="HorsieGame.py" />
-    <Compile Include="Screens\BasicWidget.py">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="Screens\BasicWidget.py"/>
     <Compile Include="Screens\GameScreen.py" />
-    <Compile Include="Screens\LoadingScreen.py">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="Screens\LoadingScreen.py"/>
     <Compile Include="Screens\MenuScreen.py" />
     <Compile Include="Screens\WelcomeScreen.py" />
     <Compile Include="Screens\__init__.py" />
@@ -60,11 +56,8 @@
     <Folder Include="Assets\Gifs\" />
     <Folder Include="Assets\Logo\" />
     <Folder Include="Databinding\" />
-    <Folder Include="Databinding\" />
-    <Folder Include="Entities\" />
     <Folder Include="Entities\" />
     <Folder Include="Assets\" />
-    <Folder Include="Screens\" />
     <Folder Include="Screens\" />
   </ItemGroup>
   <ItemGroup>
