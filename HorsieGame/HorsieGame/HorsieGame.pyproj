@@ -42,15 +42,33 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="HorsieGame.py" />
+    <Compile Include="Screens\BasicWidget.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Screens\GameScreen.py" />
+    <Compile Include="Screens\LoadingScreen.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Screens\MenuScreen.py" />
+    <Compile Include="Screens\WelcomeScreen.py" />
+    <Compile Include="Screens\__init__.py" />
     <Compile Include="TheGame.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Assets\Gifs\" />
+    <Folder Include="Assets\Logo\" />
     <Folder Include="Databinding\" />
     <Folder Include="Databinding\" />
     <Folder Include="Entities\" />
     <Folder Include="Entities\" />
+    <Folder Include="Assets\" />
+    <Folder Include="Screens\" />
+    <Folder Include="Screens\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Assets\Gifs\Loading.gif" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

@@ -1,0 +1,53 @@
+from PyQt5 import QtCore, QtGui
+from Screens.BasicWidget import BasicWidget
+from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QSpacerItem, QSizePolicy, QLabel, QPushButton, QWidget
+
+class Ui_QtWelcomeScreen(BasicWidget):
+
+
+    def __init__(self, OnBtnPress):
+        super().__init__()
+
+        self.B_InitNewGame.clicked.connect(OnBtnPress)
+
+    # SETUP UI CODE
+
+    def setupUi(self, QtWelcomeScreen):
+        QtWelcomeScreen.setObjectName("QtWelcomeScreen")
+        self.horizontalLayout = QHBoxLayout(QtWelcomeScreen)
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        spacerItem = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalLayout.addItem(spacerItem)
+        self.verticalLayout = QVBoxLayout()
+        self.verticalLayout.setObjectName("verticalLayout")
+        spacerItem1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.verticalLayout.addItem(spacerItem1)
+        self.L_Welcome = QLabel(QtWelcomeScreen)
+        font = QtGui.QFont()
+        font.setPointSize(24)
+        font.setBold(True)
+        font.setWeight(75)
+        self.L_Welcome.setFont(font)
+        self.L_Welcome.setObjectName("L_Welcome")
+        self.verticalLayout.addWidget(self.L_Welcome)
+        spacerItem2 = QSpacerItem(20, 10, QSizePolicy.Minimum, QSizePolicy.Minimum)
+        self.verticalLayout.addItem(spacerItem2)
+        self.B_InitNewGame = QPushButton(QtWelcomeScreen)
+        self.B_InitNewGame.setObjectName("B_InitNewGame")
+        self.verticalLayout.addWidget(self.B_InitNewGame)
+        spacerItem3 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.verticalLayout.addItem(spacerItem3)
+        self.horizontalLayout.addLayout(self.verticalLayout)
+        spacerItem4 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalLayout.addItem(spacerItem4)
+
+        self.retranslateUi(QtWelcomeScreen)
+        QtCore.QMetaObject.connectSlotsByName(QtWelcomeScreen)
+
+    def retranslateUi(self, QtWelcomeScreen):
+        _translate = QtCore.QCoreApplication.translate
+        QtWelcomeScreen.setWindowTitle(_translate("QtWelcomeScreen", "HorsieGame"))
+        self.L_Welcome.setText(_translate("QtWelcomeScreen", "Welcome"))
+        self.B_InitNewGame.setText(_translate("QtWelcomeScreen", "Start a game"))
+
+    # SETUP UI CODE OVER

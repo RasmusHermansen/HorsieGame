@@ -1,0 +1,70 @@
+from Screens.BasicWidget import BasicWidget
+from PyQt5 import QtCore, QtGui, QtWidgets
+
+class Ui_QtMenuScreen(BasicWidget):
+
+    def __init__(self):
+        super().__init__()
+
+    def setupUi(self, Form):
+        Form.setObjectName("Form")
+        Form.resize(915, 685)
+        self.gridLayout = QtWidgets.QGridLayout(Form)
+        self.gridLayout.setObjectName("gridLayout")
+        self.L_Players = QtWidgets.QLabel(Form)
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+        self.L_Players.setFont(font)
+        self.L_Players.setObjectName("L_Players")
+        self.gridLayout.addWidget(self.L_Players, 0, 0, 1, 1)
+        self.L_Bets = QtWidgets.QLabel(Form)
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+        self.L_Bets.setFont(font)
+        self.L_Bets.setObjectName("L_Bets")
+        self.gridLayout.addWidget(self.L_Bets, 0, 2, 1, 1)
+        self.Tbl_Horses = QtWidgets.QTableWidget(Form)
+        self.Tbl_Horses.setObjectName("Tbl_Horses")
+        self.Tbl_Horses.setColumnCount(0)
+        self.Tbl_Horses.setRowCount(0)
+        self.gridLayout.addWidget(self.Tbl_Horses, 1, 1, 1, 1)
+        self.Tbl_Players = QtWidgets.QTableWidget(Form)
+        self.Tbl_Players.setObjectName("Tbl_Players")
+        self.Tbl_Players.setColumnCount(0)
+        self.Tbl_Players.setRowCount(0)
+        self.gridLayout.addWidget(self.Tbl_Players, 1, 0, 1, 1)
+        self.horizontalLayout = QtWidgets.QHBoxLayout()
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.L_Horses = QtWidgets.QLabel(Form)
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+        self.L_Horses.setFont(font)
+        self.L_Horses.setObjectName("L_Horses")
+        self.horizontalLayout.addWidget(self.L_Horses)
+        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout.addItem(spacerItem)
+        self.In_HorsesNumber = QtWidgets.QSpinBox(Form)
+        self.In_HorsesNumber.setObjectName("In_HorsesNumber")
+        self.horizontalLayout.addWidget(self.In_HorsesNumber)
+        self.gridLayout.addLayout(self.horizontalLayout, 0, 1, 1, 1)
+        self.B_StartRun = QtWidgets.QPushButton(Form)
+        self.B_StartRun.setObjectName("B_StartRun")
+        self.gridLayout.addWidget(self.B_StartRun, 2, 2, 1, 1)
+
+        self.retranslateUi(Form)
+        QtCore.QMetaObject.connectSlotsByName(Form)
+
+    def retranslateUi(self, Form):
+        _translate = QtCore.QCoreApplication.translate
+        Form.setWindowTitle(_translate("Form", "Form"))
+        self.L_Players.setText(_translate("Form", "Players"))
+        self.L_Bets.setText(_translate("Form", "Bets"))
+        self.L_Horses.setText(_translate("Form", "Horses"))
+        self.B_StartRun.setText(_translate("Form", "PushButton"))
+
