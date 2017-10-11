@@ -27,10 +27,13 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="HorsieServer\api.py">
+    <Compile Include="HorsieServer\WebApi.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="HorsieServer\db.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HorsieServer\GameApi.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="HorsieServer\templates\Game.html">

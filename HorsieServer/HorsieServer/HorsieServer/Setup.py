@@ -1,6 +1,6 @@
 import os, datetime
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
-
+from flask_socketio import SocketIO
 ## INIT APP ##
 
 app = Flask(__name__)
@@ -12,6 +12,7 @@ app.config.update(dict(
     SECRET_KEY= 'fTcCO24fOIcMShAvHJ5v7TVEuEnKoaQPMLvX5PRw'
     ))
 
+socketio = SocketIO(app)
 '''
 @app.before_first_request
 def PersistentSession():
@@ -21,4 +22,5 @@ def PersistentSession():
 
 import HorsieServer.db as db
 import HorsieServer.views
-import HorsieServer.api
+import HorsieServer.WebApi
+import HorsieServer.GameApi

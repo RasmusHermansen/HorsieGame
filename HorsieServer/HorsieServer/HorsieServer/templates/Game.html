@@ -15,7 +15,11 @@
 <!--DEV GAMEINFO TOGGLE-->
 <div class="container gameContainer" style="display:none">
     <div class="row shadedAndWhite">
-        <div class="col-md-6">
+        <div class="col-md-4">
+            <h1>SocketIO:</h1>
+            <p id="SocketOutput"></p>
+        </div>
+        <div class="col-md-4">
             <h1>From table Users:</h1>
             <ul>
                 {% for entry in tbUsers %}
@@ -27,7 +31,7 @@
                 {% endfor %}
             </ul>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
             <h1>From table Horses</h1>
             <ul>
                 {% for entry in tbHorses %}

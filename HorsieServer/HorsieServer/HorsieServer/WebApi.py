@@ -38,7 +38,6 @@ def CreateSession():
     # Get new sessionId
     return jsonify({'sessionName': sessionName, 'uniqueId': database.ActiveSessionIdFromSessionName(sessionName), 'sessionKey':sessionKey})
 
-
 def _ValidRequest(request):
     """ Ensures request is Json, session is active and the correct session key is supplied"""
     if not request.json:
