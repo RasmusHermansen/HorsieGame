@@ -1,22 +1,21 @@
 from Entities import VisualObject
-import numpy as np
-import matplotlib.pyplot as plt
 from scipy import interpolate
 
 
-class Horse(object):
-    def __init__(self,KnotPoints,KnotValues,position):
+class Horse(VisualObject):
+    def __init__(self, x, y, png, KnotPoints, KnotValues):
         # Den fucking hest
         self.KnotPoints = KnotPoints
         self.KnotValues = KnotValues
-        self.position = position
+        self.t = 0
+        self.tck = interpolate.splrep(KnotPoints,KnotValues,s=0)
      
-    def Run(self):
-        tck = interpolate.splrep(self.KnotPoints,self.KnotValues,s=0)
-        self.position += interpolate.splint(0, self.KnotPoints[2], tck)
+        super().__init__(x,y,png)
+
+    def Run(self, T):
+        self.x += interpolate.splint(self.t, T, self.tck)
+        self.t = T
+
+
       
 
-Tarok = Horse([0,0.5,0.67,0.98,1.2], [1,1.2,0.78,0.42,1.1], 0)
-Tarok.Run()
-
-print (Tarok.position)
