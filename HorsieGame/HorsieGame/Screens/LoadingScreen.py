@@ -40,8 +40,11 @@ class Ui_QtLoadingScreen(BasicWidget):
         self.verticalLayout.addItem(spacerItem2)
 
         # Status label
+        font = QtGui.QFont()
+        font.setBold(True)
         self.L_LoadingMsg = QLabel(QtWelcomeScreen)
         self.L_LoadingMsg.setObjectName("L_LoadingMsg")
+        self.L_LoadingMsg.setFont(font)
         self.L_LoadingMsg.setAlignment(QtCore.Qt.AlignCenter)
         self.verticalLayout.addWidget(self.L_LoadingMsg)
         spacerItem3 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
