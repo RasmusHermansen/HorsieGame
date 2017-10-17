@@ -1,21 +1,25 @@
-from Entities import VisualObject
 from scipy import interpolate
+import random
 
 
-class Horse(VisualObject):
-    def __init__(self, x, y, png, KnotPoints, KnotValues):
+class Horse(object):
+
+    def __init__(self,name, KnotPoints, KnotValues):
         # Den fucking hest
         self.KnotPoints = KnotPoints
-        self.KnotValues = KnotValues
+        self.KnotValues = [knot + random.normalvariate(0,2) for knot in KnotValues]
+        self.MaxT = max(KnotPoints)
+        self.MaxTSpeed = KnotValues[len(KnotValues)-1]
         self.t = 0
-        self.tck = interpolate.splrep(KnotPoints,KnotValues,s=0)
-     
-        super().__init__(x,y,png)
+        self.Name = name
+        self.tck = interpolate.splrep(KnotPoints,KnotValues,s=0) 
+
+        super().__init__()
 
     def Run(self, T):
-        self.x += interpolate.splint(self.t, T, self.tck)
+        distance = interpolate.splint(self.t, T, self.tck) if (T < self.MaxT) else self.MaxTSpeed*(T - self.t)
         self.t = T
-
+        return distance
 
       
 
