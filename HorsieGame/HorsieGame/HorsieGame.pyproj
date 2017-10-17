@@ -26,6 +26,9 @@
     <Compile Include="Entities\Horse.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Entities\QtHorse.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Entities\__init__.py">
       <SubType>Code</SubType>
     </Compile>

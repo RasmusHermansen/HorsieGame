@@ -1,6 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from Screens.BasicWidget import BasicWidget
-from Entities.Horse import Horse
+from Entities.QtHorse import QtHorse
 from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import QColor, QPen
 import random
@@ -10,7 +10,6 @@ class Ui_QtGameScreen(BasicWidget):
     def __init__(self, postGameCB, horses):
         super().__init__()
 
-        self.HorseGifs = ["Assets/Horses/Base.gif", "Assets/Horses/BlackHorse.gif"]
 
         self._constructBackground()
         self._constructHorses(horses)
@@ -25,31 +24,12 @@ class Ui_QtGameScreen(BasicWidget):
         knotPoints = [0, knotIncrement, knotIncrement*2, knotIncrement*3, knotIncrement*4, knotIncrement*5]
         # Instantiate horses
         self.HorseEntities = []
-        for horsie in horses:
-            knotvalues = [horsie['Knot1'],horsie['Knot2'],horsie['Knot3'],horsie['Knot4'],horsie['Knot5'],horsie['Knot1']]
-            self.HorseEntities.append(Horse(horsie['Name'],knotPoints,knotvalues))
 
-        horsieNumber = 0;
-        for horsie in self.HorseEntities:
-            horsie.Finished = False
-            horsieNumber += 1;
-            # Create Horse Object (Gif)
-            horsie.Obj = QtWidgets.QLabel()
-            horsie.Gif = QtGui.QMovie(random.choice(self.HorseGifs))
-            # Make label background transparent
-            horsie.Obj.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-            horsie.Obj.setWindowFlags(QtCore.Qt.FramelessWindowHint)
-            # Instantiate
-            horsie.Obj.setObjectName(horsie.Name + "_gif")
-            horsie.Obj.setMovie(horsie.Gif)
-            horsie.Gif.start()
-            # Initialize proxy widgets
-            horsie.Widget = QtWidgets.QGraphicsProxyWidget()
-            horsie.Widget.setWidget(horsie.Obj)
-            # Add to scene
-            self.Scene.addItem(horsie.Widget)
-            # Set starting position
-            horsie.Widget.setPos(0, round(0.6*self.Scene.height()) + horsieNumber*25)
+        for i, horsie in enumerate(horses):
+            knotvalues = [horsie['Knot1'],horsie['Knot2'],horsie['Knot3'],horsie['Knot4'],horsie['Knot5'],horsie['Knot1']]
+            horse = QtHorse(horsie['Name'],knotPoints,knotvalues, self.Scene)
+            self.HorseEntities.append(horse)
+            horse.Widget.setPos(0, round(0.6*self.Scene.height()) + i*25)
 
     def _constructBackground(self):
         self.BackGroundSpeed = -10
@@ -108,24 +88,56 @@ class Ui_QtGameScreen(BasicWidget):
         font.setBold(True)
         if(place == 1):
             color = QColor(255, 215, 0)
-            font.setPointSize(150)
+            displacement = 0
+            font.setPointSize(80)
+            self._GrapWinningPhoto()
         elif(place == 2):
             color = QColor(192, 192, 192)
-            font.setPointSize(120)
+            displacement = 100
+            font.setPointSize(72)
         elif(place == 3):
             color = QColor(205, 127, 50)
-            font.setPointSize(90)
+            displacement = 190
+            font.setPointSize(66)
         else:
             color = QColor(0, 0, 0)
-            font.setPointSize(72)
+            displacement = 270 + (place - 4)*75
+            font.setPointSize(60)
 
         placementLabel = self.Scene.addText(str(place) + ": " + name, font)
         placementLabel.setDefaultTextColor(color)
-        placementLabel.setPos(self.Scene.width()/2-placementLabel.textWidth(), 200 + 60*place)
+        placementLabel.setPos(self.Scene.width()/3, 150 + displacement)
 
     def _CreateReturnToMenuButton(self):
-        returnLabel = self.Scene.addText("Return to Menu")
-        returnLabel.setPos(self.Scene.width()/2-returnLabel.textWidth(), self.Scene.height()*0.75)
+        returnLabel = QtWidgets.QPushButton()
+        returnLabel.setObjectName("B_ReturnToMenu")
+        returnLabel.setText("Return to Menu")
+        returnLabel.clicked.connect(lambda : self._postGameCB(self.HorsesFinished))
+        # Initialize proxy widgets
+        widget = QtWidgets.QGraphicsProxyWidget()
+        widget.setWidget(returnLabel)
+        # Add to scene
+        self.Scene.addItem(widget)
+        # Set starting position
+        widget.setPos(self.Scene.width()/2-returnLabel.width()/2, 0.85*self.Scene.height())
+
+    def _DisplayWinningPhoto(self):
+        photoObj = QtWidgets.QLabel()
+        photoObj.setPixmap(self.WinningPhoto)
+        photoObj.setStyleSheet("border: 2px solid")
+        # Initialize proxy widgets
+        widget = QtWidgets.QGraphicsProxyWidget()
+        widget.setWidget(photoObj)
+        # Add to scene
+        self.Scene.addItem(widget)
+        # Set starting position
+        widget.setPos(50, 0.4*self.Scene.height())
+        # Draw text above
+        font = QtGui.QFont()
+        font.setBold(True)
+        font.setPointSize(32)
+        textLabel = self.Scene.addText("Winning Photo", font)
+        textLabel.setPos(50, 0.35*self.Scene.height())
 
     def _CheckFinish(self):
         if(self.FinishLineActive):
@@ -143,6 +155,7 @@ class Ui_QtGameScreen(BasicWidget):
             # Check if all horses crossed finishline
             if len(self.HorsesFinished) == len(self.HorseEntities):
                     self.timer.stop()
+                    self._DisplayWinningPhoto()
                     self._CreateReturnToMenuButton()
 
             # Move finishLine
@@ -156,6 +169,11 @@ class Ui_QtGameScreen(BasicWidget):
                     self.FinishLineWidget = self.Scene.addRect(self.Scene.width(),round(0.6*self.Scene.height()),3,round(0.4*self.Scene.height()),pen,redColor)
                     self.FinishLineActive = True
                     self.HorsesFinished = {}
+
+    def _GrapWinningPhoto(self):
+        # target rect
+        targetRect = self.FinishLineWidget.rect().adjusted(-500,-60,-150,-75)
+        self.WinningPhoto = self.Widget.grab(targetRect.toRect())
 
     def _MoveHorses(self):
         for horse in self.HorseEntities:
