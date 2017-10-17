@@ -8,6 +8,7 @@ class QtLinkLabel(QtWidgets.QLabel):
         self.setMouseTracking(True)        
         self.baseColor = baseColor
         self.hoverColor = hoverColor
+        self.setAlignment(QtCore.Qt.AlignCenter)
 
     def enterEvent(self, event):
         self.setStyleSheet("color:" + self.hoverColor)
