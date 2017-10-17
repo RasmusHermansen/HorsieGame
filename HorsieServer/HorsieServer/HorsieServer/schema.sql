@@ -23,7 +23,12 @@ create table Horses (
   id INTEGER primary key autoincrement,
   SessionId INTEGER not null,
   Name TEXT not null,
-  Speed REAL not null
+  Knot1 REAL not null,
+  Knot2 REAL not null,
+  Knot3 REAL not null,
+  Knot4 REAL not null,
+  Knot5 REAL not null,
+  Knot6 REAL not null
 );
 
 drop table if exists Actions;

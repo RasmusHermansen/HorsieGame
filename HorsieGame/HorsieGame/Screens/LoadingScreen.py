@@ -30,7 +30,7 @@ class Ui_QtLoadingScreen(BasicWidget):
         
         # Loading gif
         self.L_Loading = QLabel(QtWelcomeScreen)
-        gif = QtGui.QMovie("Assets/Gifs/Loading.gif")
+        gif = QtGui.QMovie("Assets/General/Loading.gif")
         self.L_Loading.setObjectName("L_Loading")
         self.L_Loading.setMovie(gif)
         gif.start()

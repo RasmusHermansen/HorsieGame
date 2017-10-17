@@ -1,4 +1,4 @@
-import GameSettings as cfg, sys, TheGame
+import GameSettings as cfg, sys, GameMaster
 from PyQt5.QtWidgets import QApplication
 
 
@@ -11,7 +11,7 @@ settings = cfg.GameSettings(
 app = QApplication(sys.argv)
 
 # Start the game
-Game = TheGame.Game(settings, app)
+Game = GameMaster.GameMaster(settings, app)
 
 # Cleanup
 sys.exit(app.exec_())

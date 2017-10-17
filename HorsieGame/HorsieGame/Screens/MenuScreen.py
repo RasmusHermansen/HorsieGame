@@ -4,10 +4,11 @@ from PyQt5.QtWidgets import QTableWidgetItem
 
 class Ui_QtMenuScreen(BasicWidget):
 
-    def __init__(self, HorsesChange):
+    def __init__(self, horsesChange, startGame):
         super().__init__()
 
-        self.In_HorsesNumber.valueChanged.connect(HorsesChange)
+        self.In_HorsesNumber.valueChanged.connect(horsesChange)
+        self.B_StartRun.clicked.connect(startGame)
 
     def SetPlayers(self, players, header):
         self.__PopulateTable(players, header, self.Tbl_Players)
@@ -28,7 +29,6 @@ class Ui_QtMenuScreen(BasicWidget):
 
     def setupUi(self, QtMenuScreen):
         QtMenuScreen.setObjectName("QtMenuScreen")
-        QtMenuScreen.resize(915, 685)
         self.gridLayout = QtWidgets.QGridLayout(QtMenuScreen)
         self.gridLayout.setObjectName("gridLayout")
         self.L_Players = QtWidgets.QLabel(QtMenuScreen)
@@ -78,7 +78,8 @@ class Ui_QtMenuScreen(BasicWidget):
         self.horizontalLayout.addItem(spacerItem)
         self.In_HorsesNumber = QtWidgets.QSpinBox(QtMenuScreen)
         self.In_HorsesNumber.setButtonSymbols(QtWidgets.QAbstractSpinBox.NoButtons)
-        self.In_HorsesNumber.setMaximum(10)
+        self.In_HorsesNumber.setMaximum(9)
+        self.In_HorsesNumber.setMinimum(2)
         self.In_HorsesNumber.setObjectName("In_HorsesNumber")
         self.horizontalLayout.addWidget(self.In_HorsesNumber)
         self.gridLayout.addLayout(self.horizontalLayout, 0, 1, 1, 1)

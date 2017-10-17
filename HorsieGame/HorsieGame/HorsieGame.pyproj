@@ -45,20 +45,28 @@
     <Compile Include="Screens\MenuScreen.py" />
     <Compile Include="Screens\WelcomeScreen.py" />
     <Compile Include="Screens\__init__.py" />
-    <Compile Include="TheGame.py">
+    <Compile Include="GameMaster.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Assets\Gifs\" />
     <Folder Include="Assets\Logo\" />
+    <Folder Include="Assets\Background\" />
+    <Folder Include="Assets\Horses\" />
+    <Folder Include="Assets\General\" />
+    <Folder Include="Assets\Font\" />
+    <Folder Include="Assets\MenuBackgrounds\" />
     <Folder Include="Databinding\" />
     <Folder Include="Entities\" />
     <Folder Include="Assets\" />
     <Folder Include="Screens\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Assets\Gifs\Loading.gif" />
+    <Content Include="Assets\Background\treeOne.png" />
+    <Content Include="Assets\Font\south park.ttf" />
+    <Content Include="Assets\General\Loading.gif" />
+    <Content Include="Assets\Horses\Base.gif" />
+    <Content Include="Assets\Horses\BlackHorse.gif" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
