@@ -42,6 +42,12 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="HorsieGame.py" />
+    <Compile Include="QtExtensions\QtLinkLabel.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="QtExtensions\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Screens\BasicWidget.py" />
     <Compile Include="Screens\GameScreen.py" />
     <Compile Include="Screens\LoadingScreen.py" />
@@ -62,6 +68,7 @@
     <Folder Include="Databinding\" />
     <Folder Include="Entities\" />
     <Folder Include="Assets\" />
+    <Folder Include="QtExtensions\" />
     <Folder Include="Screens\" />
   </ItemGroup>
   <ItemGroup>

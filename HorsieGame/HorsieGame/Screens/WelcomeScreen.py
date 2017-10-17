@@ -1,6 +1,7 @@
 from PyQt5 import QtCore, QtGui
 from Screens.BasicWidget import BasicWidget
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QSpacerItem, QSizePolicy, QLabel, QPushButton, QWidget
+from QtExtensions.QtLinkLabel import QtLinkLabel
 
 class Ui_QtWelcomeScreen(BasicWidget):
 
@@ -8,7 +9,7 @@ class Ui_QtWelcomeScreen(BasicWidget):
     def __init__(self, OnBtnPress):
         super().__init__()
 
-        self.B_InitNewGame.clicked.connect(OnBtnPress)
+        self.B_InitNewGame.connectClick(OnBtnPress)
 
     # SETUP UI CODE
 
@@ -34,7 +35,7 @@ class Ui_QtWelcomeScreen(BasicWidget):
         self.verticalLayout.addWidget(self.L_Welcome)
         spacerItem2 = QSpacerItem(20, 10, QSizePolicy.Minimum, QSizePolicy.Minimum)
         self.verticalLayout.addItem(spacerItem2)
-        self.B_InitNewGame = QPushButton(QtWelcomeScreen)
+        self.B_InitNewGame = QtLinkLabel(QtWelcomeScreen)
         self.B_InitNewGame.setObjectName("B_InitNewGame")
         self.B_InitNewGame.setAttribute(QtCore.Qt.WA_TranslucentBackground)
         self.B_InitNewGame.setWindowFlags(QtCore.Qt.FramelessWindowHint)
