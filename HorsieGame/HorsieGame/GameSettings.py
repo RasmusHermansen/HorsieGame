@@ -13,6 +13,7 @@ class GameSettings(object, metaclass=Singleton):
     # Tuple: (Required, Example Value)
     Url = (True,"Local") # The URL the game should connect to
     Debug = (False, False) # True if Debug else false
+    AntiAliasing = (False, 2) # 0 => None, 1 => Std, 2 => High
 
     def __init__(self, *initial_data, **kwargs):
         # Write properties

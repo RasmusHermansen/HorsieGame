@@ -3,6 +3,7 @@ from Screens.BasicWidget import BasicWidget
 from Entities.QtHorse import QtHorse
 from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import QColor, QPen
+from GameSettings import GameSettings as Settings
 import random
 
 class Ui_QtGameScreen(BasicWidget):
@@ -234,6 +235,11 @@ class Ui_QtGameScreen(BasicWidget):
         self.GameView.setScene(self.Scene)
         self.retranslateUi(Game)
         QtCore.QMetaObject.connectSlotsByName(Game)
+
+        if(Settings().AntiAliasing == 2):
+            self.GameView.setRenderHint(QtGui.QPainter.HighQualityAntialiasing)
+        elif(Settings().AntiAliasing == 1):
+            self.GameView.setRenderHint(QtGui.QPainter.Antialiasing)
 
     def retranslateUi(self, Game):
         _translate = QtCore.QCoreApplication.translate
