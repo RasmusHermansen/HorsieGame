@@ -45,6 +45,9 @@
     <Compile Include="QtExtensions\QtLinkLabel.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="QtExtensions\QtSceneSprite.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="QtExtensions\__init__.py">
       <SubType>Code</SubType>
     </Compile>
