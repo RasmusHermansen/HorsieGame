@@ -1,18 +1,28 @@
-class GameSettings(object):
-    """GameSettings holds the general important properties"""
-    # Tuple: (Required,Example Value (Default value for Required = False))
-    URL = (True,"Local") # The URL the game should connect to
-    DEBUG = (False, False)
+class Singleton(type):
+    _instances = {}
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
+
+    def Instantiated(self):
+        return bool(self._instances)
+
+class GameSettings(object, metaclass=Singleton):
+    ''' A singleton pattern implementing GameSettings '''
+    # Tuple: (Required, Example Value)
+    Url = (True,"Local") # The URL the game should connect to
+    Debug = (False, False) # True if Debug else false
 
     def __init__(self, *initial_data, **kwargs):
         # Write properties
-        for dictionary in initial_data:
-            for key in dictionary:
+        for dict in initial_data:
+            for key in dict:
                 if hasattr(self,key):
-                    self.__setNewattr(key, dictionary[key])
+                    self.__setAttr(key, dict[key])
         for key in kwargs:
             if hasattr(self,key):
-                self.__setNewattr(key, kwargs[key])
+                self.__setAttr(key, kwargs[key])
         # Check input
         for prop in self.__dir__():
             if(isinstance(getattr(self, prop), tuple) and len(getattr(self, prop)) == 2):
@@ -23,7 +33,7 @@ class GameSettings(object):
                 # Set not required to default
                 setattr(self, prop, definition[1])
 
-    def __setNewattr(self, key, value):
+    def __setAttr(self, key, value):
         definition = getattr(self, key)
         if(isinstance(value,type(definition[1]))):
             setattr(self, key, value)

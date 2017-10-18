@@ -1,34 +1,33 @@
 from Databinding.Connection import ServerConnection
 from Databinding.Querier import Querier
-import GameSettings, sys, os, threading
+import sys, os, threading
+from GameSettings import GameSettings as Settings
 from PyQt5.QtWidgets import QWidget, QMainWindow, QLabel, QGridLayout, QSizePolicy
 from PyQt5.QtGui import QIcon, QFontDatabase, QFont
 from PyQt5.QtCore import QThread, pyqtSignal, QTimer
 from Screens import WelcomeScreen, MenuScreen, GameScreen, LoadingScreen
-
-MainFont = None
 
 class GameMaster(QMainWindow):
 
     _updateFuncs = []
     _inPerformUpdateFuncs = False
 
-    def __init__(self, settings, QtApp):
-        assert isinstance(settings,GameSettings.GameSettings), "Invalid Settings object passed to Game"
+    def __init__(self, QtApp):
         # Store parent app
         self.app = QtApp
-        # Store settings
-        self.Settings = settings
+        # Ensure settings are initialized
+        if(not Settings.Instantiated()):
+            raise EnvironmentError("GameSettings Object not initialized")
         # Init Qt
         super().__init__()
         # Init Assets
-        self._LoadAssets(settings)
+        self._LoadAssets()
         # Init background worker
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.PerformUpdateFuncs)
         self.timer.start(1000)
         # Initialize main window
-        self.__InitMainWindow(settings)
+        self.__InitMainWindow()
         # Prepare Loading widget
         self.SetToWelcome()
         # Show
@@ -74,7 +73,7 @@ class GameMaster(QMainWindow):
     # Makes the request to Server and establishes a conn
     def _InitConnection(self):
         self.LoadingWidget.ChangeStatus("Establishing connection to server")
-        conn = Querier(ServerConnection(self.Settings.URL))
+        conn = Querier(ServerConnection(Settings().Url))
         self.LoadingWidget.ChangeStatus("Instantiating new session")
         return conn, conn.InstantiateNewSession()
     
@@ -140,9 +139,9 @@ class GameMaster(QMainWindow):
 
 #endregion
 
-    def __InitMainWindow(self, settings):
+    def __InitMainWindow(self):
         # Set size
-        if(settings.DEBUG):
+        if(Settings().Debug):
             self.resize(1000, 600)
             self.move(300, 300)
         else:
@@ -152,7 +151,7 @@ class GameMaster(QMainWindow):
         # Set Icon
         self.setWindowIcon(QIcon("Assets/Logo/Logo_64.png"))
 
-    def _LoadAssets(self, settings):
+    def _LoadAssets(self):
         fontId = QFontDatabase().addApplicationFont("Assets/Font/south park.ttf")
         family = QFontDatabase().applicationFontFamilies(fontId)[0]
         MainFont = QFont(family)
