@@ -10,6 +10,7 @@ class QtHorse(Horse):
         super().__init__(name, KnotPoints, KnotValues)
 
         self.Finished = False
+        self.FinishT = 9999
 
         # Create Horse Object (Gif)
         self.Obj = QtWidgets.QLabel()

@@ -83,26 +83,25 @@ class Ui_QtGameScreen(BasicWidget):
         self._ProcessBackground()
         self._CheckFinish()
 
-    def _WriteHorseFinished(self, place, name):
+    def HandleHorseFinish(self, place, name):
         font = QtGui.QFont()
         font.setBold(True)
         if(place == 1):
             color = QColor(255, 215, 0)
             displacement = 0
-            font.setPointSize(80)
-            self._GrapWinningPhoto()
+            font.setPointSize(72)
         elif(place == 2):
             color = QColor(192, 192, 192)
-            displacement = 100
-            font.setPointSize(72)
+            displacement = 90
+            font.setPointSize(66)
         elif(place == 3):
             color = QColor(205, 127, 50)
-            displacement = 190
-            font.setPointSize(66)
+            displacement = 180
+            font.setPointSize(60)
         else:
             color = QColor(0, 0, 0)
-            displacement = 270 + (place - 4)*75
-            font.setPointSize(60)
+            displacement = 265 + (place - 4)*80
+            font.setPointSize(56)
 
         placementLabel = self.Scene.addText(str(place) + ": " + name, font)
         placementLabel.setDefaultTextColor(color)
@@ -122,8 +121,9 @@ class Ui_QtGameScreen(BasicWidget):
         widget.setPos(self.Scene.width()/2-returnLabel.width()/2, 0.85*self.Scene.height())
 
     def _DisplayWinningPhoto(self):
+        # Initialise Label
         photoObj = QtWidgets.QLabel()
-        photoObj.setPixmap(self.WinningPhoto)
+        photoObj.setPixmap(self.FinishLinePhotos[0])
         photoObj.setStyleSheet("border: 2px solid")
         # Initialize proxy widgets
         widget = QtWidgets.QGraphicsProxyWidget()
@@ -136,8 +136,18 @@ class Ui_QtGameScreen(BasicWidget):
         font = QtGui.QFont()
         font.setBold(True)
         font.setPointSize(32)
-        textLabel = self.Scene.addText("Winning Photo", font)
+        textLabel = self.Scene.addText("Slowmo Recap", font)
         textLabel.setPos(50, 0.35*self.Scene.height())
+
+        # Start slowmotion T
+        self.timer.timeout.disconnect()
+        self.T = 0
+        self.timer.timeout.connect(lambda : self._ChangeWinningPhoto(photoObj))
+        self.timer.start(500)
+
+    def _ChangeWinningPhoto(self, photoObj):
+        photoObj.setPixmap(self.FinishLinePhotos[self.T % len(self.FinishLinePhotos)])
+        self.T += 1
 
     def _CheckFinish(self):
         if(self.FinishLineActive):
@@ -147,10 +157,11 @@ class Ui_QtGameScreen(BasicWidget):
             # Check if horses crossed finishline
             for horse in self.HorseEntities:
                 if not horse.Finished and horse.Widget.pos().x() + horse.Widget.preferredWidth() > finishLinexPos:
-                    self.HorsesFinished[len(self.HorsesFinished)] = horse.Name
+                    self.HorsesFinished[len(self.HorsesFinished)] = horse
                     horse.Finished = True
+                    horse.FinishT = self.T
                     self.BackGroundSpeed = 0
-                    self._WriteHorseFinished(len(self.HorsesFinished), horse.Name)
+                    self.HandleHorseFinish(len(self.HorsesFinished), horse.Name)
 
             # Check if all horses crossed finishline
             if len(self.HorsesFinished) == len(self.HorseEntities):
@@ -169,11 +180,20 @@ class Ui_QtGameScreen(BasicWidget):
                     self.FinishLineWidget = self.Scene.addRect(self.Scene.width(),round(0.6*self.Scene.height()),3,round(0.4*self.Scene.height()),pen,redColor)
                     self.FinishLineActive = True
                     self.HorsesFinished = {}
+                    # Start Capture Finish line
+                    self.FinishLinePhotos = []
+                    self.timer.timeout.connect(self._GrapFinishLinePhoto)
 
-    def _GrapWinningPhoto(self):
+    def _GrapFinishLinePhoto(self):
         # target rect
         targetRect = self.FinishLineWidget.rect().adjusted(-500,-60,-150,-75)
-        self.WinningPhoto = self.Widget.grab(targetRect.toRect())
+        self.FinishLinePhotos.append(self.GameView.grab(targetRect.toRect()))
+
+        if(len(self.FinishLinePhotos) > 2 and len(self.HorsesFinished) == 0):
+            self.FinishLinePhotos.pop(0)
+        if(len(self.HorsesFinished) > 2 and self.HorsesFinished[2].FinishT + 2 < self.T):
+            self.timer.timeout.disconnect(self._GrapFinishLinePhoto)
+
 
     def _MoveHorses(self):
         for horse in self.HorseEntities:
@@ -205,14 +225,13 @@ class Ui_QtGameScreen(BasicWidget):
         self.GameView.setSizePolicy(sizePolicy)
         self.GameView.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.GameView.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        #self.GameView.setInteractive(False)
+        self.GameView.setViewportUpdateMode(QtWidgets.QGraphicsView.FullViewportUpdate)
         self.GameView.setObjectName("GameView")
         self.GameView.setContentsMargins(0,0,0,0)
         self.horizontalLayout.addWidget(self.GameView)
         self.Scene = QtWidgets.QGraphicsScene(Game)
         self.Scene.setSceneRect(0,0,self.Widget.width(), self.Widget.height())
         self.GameView.setScene(self.Scene)
-
         self.retranslateUi(Game)
         QtCore.QMetaObject.connectSlotsByName(Game)
 
