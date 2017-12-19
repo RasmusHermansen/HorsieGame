@@ -1,4 +1,5 @@
 from Entities.Horse import Horse
+from QtExtensions.QtSprites import QtDynLenSprite
 from PyQt5 import QtGui, QtWidgets, QtCore
 import random
 
@@ -13,19 +14,16 @@ class QtHorse(Horse):
         self.FinishT = 9999
 
         # Create Horse Object (Gif)
-        self.Obj = QtWidgets.QLabel()
-        self.Gif = QtGui.QMovie(self._GetHorseAsset())
+        self.Obj = QtDynLenSprite()
         # Make label background transparent
-        self.Obj.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-        self.Obj.setWindowFlags(QtCore.Qt.FramelessWindowHint)
-        # Instantiate
-        self.Obj.setObjectName(self.Name + "_gif")
-        self.Obj.setMovie(self.Gif)
-        self.Gif.start()            
-        self.Widget = QtWidgets.QGraphicsProxyWidget()
-        self.Widget.setWidget(self.Obj)
+        horseData = self._GetHorseAsset();
+        self.Obj.setSpriteAsset(horseData[0],horseData[1],horseData[2])
+        self.Obj.setSpriteSpeed(2)
         # Add to scene
-        Scene.addItem(self.Widget)
+        Scene.addItem(self.Obj)
 
     def _GetHorseAsset(self):
-        return random.choice(["Assets/Horses/WhiteHorse.gif", "Assets/Horses/BlackHorse.gif", "Assets/Horses/JihadHorse.gif"])
+        return random.choice([
+            ["Assets/Horses/White_Sprite.png",256,176],
+            ["Assets/Horses/White_Sprite.png",256,176]
+            ])

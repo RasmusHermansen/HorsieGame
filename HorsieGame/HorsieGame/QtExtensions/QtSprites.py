@@ -53,7 +53,7 @@ class QtBaseSprite(QtWidgets.QGraphicsPixmapItem):
     def paint(self, QPainter, QStyleOptionGraphicsItem, QWidget):
         if(self._spriteAsset != None and self._spriteActivelyManaged):
             self._spriteCurrentDisplays += 1
-            if (self._spriteCurrentDisplays == self._spriteSpeed):
+            if (self._spriteCurrentDisplays >= self._spriteSpeed):
                 self._UpdateSprite()
                 self._spriteCurrentDisplays = 0
         return super().paint(QPainter, QStyleOptionGraphicsItem, QWidget)

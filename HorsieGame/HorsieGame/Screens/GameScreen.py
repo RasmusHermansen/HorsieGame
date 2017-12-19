@@ -11,6 +11,8 @@ class Ui_QtGameScreen(BasicWidget):
     def __init__(self, postGameCB, horses):
         super().__init__()
 
+        #Options
+        self.UpdateSpeed = 10 #/ Framerate
 
         self._constructBackground()
         self._constructHorses(horses)
@@ -21,7 +23,7 @@ class Ui_QtGameScreen(BasicWidget):
 
     def _constructHorses(self, horses):
         # Resolve Knots
-        knotIncrement = 30;
+        knotIncrement = 3*self.UpdateSpeed
         knotPoints = [0, knotIncrement, knotIncrement*2, knotIncrement*3, knotIncrement*4, knotIncrement*5]
         # Instantiate horses
         self.HorseEntities = []
@@ -30,10 +32,10 @@ class Ui_QtGameScreen(BasicWidget):
             knotvalues = [horsie['Knot1'],horsie['Knot2'],horsie['Knot3'],horsie['Knot4'],horsie['Knot5'],horsie['Knot1']]
             horse = QtHorse(horsie['Name'],knotPoints,knotvalues, self.Scene)
             self.HorseEntities.append(horse)
-            horse.Widget.setPos(0, round(0.6*self.Scene.height()) + i*25)
+            horse.Obj.setPos(0, round(0.6*self.Scene.height()) + i*25)
 
     def _constructBackground(self):
-        self.BackGroundSpeed = -10
+        self.BackGroundSpeed = -0.1*self.UpdateSpeed
 
         pen = QPen()
         # Earth
@@ -144,7 +146,7 @@ class Ui_QtGameScreen(BasicWidget):
         self.timer.timeout.disconnect()
         self.T = 0
         self.timer.timeout.connect(lambda : self._ChangeWinningPhoto(photoObj))
-        self.timer.start(500)
+        self.timer.start(5*self.UpdateSpeed)
 
     def _ChangeWinningPhoto(self, photoObj):
         photoObj.setPixmap(self.FinishLinePhotos[self.T % len(self.FinishLinePhotos)])
@@ -152,12 +154,9 @@ class Ui_QtGameScreen(BasicWidget):
 
     def _CheckFinish(self):
         if(self.FinishLineActive):
-            # Compute finishline position
-            finishLinexPos = self.FinishLineWidget.rect().x() + self.FinishLineWidget.rect().width() + self.FinishLineWidget.pos().x()
-
             # Check if horses crossed finishline
             for horse in self.HorseEntities:
-                if not horse.Finished and horse.Widget.pos().x() + horse.Widget.preferredWidth() > finishLinexPos:
+                if not horse.Finished and horse.Obj.collidesWithItem(self.FinishLineWidget):
                     self.HorsesFinished[len(self.HorsesFinished)] = horse
                     horse.Finished = True
                     horse.FinishT = self.T
@@ -174,7 +173,7 @@ class Ui_QtGameScreen(BasicWidget):
             self.FinishLineWidget.moveBy(self.BackGroundSpeed,0)
         else:
             for horse in self.HorseEntities:
-                if horse.Widget.pos().x() > self.Scene.width()*0.65:
+                if horse.Obj.pos().x() > self.Scene.width()*0.65:
                     pen = QPen()
                     # red
                     redColor = QColor(225,0,0)
@@ -190,9 +189,9 @@ class Ui_QtGameScreen(BasicWidget):
         targetRect = self.FinishLineWidget.rect().adjusted(-500,-60,-150,-75)
         self.FinishLinePhotos.append(self.GameView.grab(targetRect.toRect()))
 
-        if(len(self.FinishLinePhotos) > 2 and len(self.HorsesFinished) == 0):
+        if(len(self.FinishLinePhotos) > 200/self.UpdateSpeed and len(self.HorsesFinished) == 0):
             self.FinishLinePhotos.pop(0)
-        if(len(self.HorsesFinished) > 2 and self.HorsesFinished[2].FinishT + 2 < self.T):
+        if(len(self.HorsesFinished) > 200/self.UpdateSpeed and self.HorsesFinished[2].FinishT + 2 < self.T):
             self.timer.timeout.disconnect(self._GrapFinishLinePhoto)
 
 
@@ -200,14 +199,14 @@ class Ui_QtGameScreen(BasicWidget):
         for horse in self.HorseEntities:
             speed = horse.Run(self.T)
             # Adjust Horse gif speed
-            horse.Gif.setSpeed(round(speed*20))
+            horse.Obj.setSpriteSpeed((round(20*self.UpdateSpeed/speed)+1))
             # Horse.Run(t)
-            horse.Widget.moveBy(speed,0)
+            horse.Obj.moveBy(self.UpdateSpeed*speed/100,0)
 
     def RunGame(self):
         self.GameView.show()
         self.T = 0
-        self.timer.start(100)   
+        self.timer.start(self.UpdateSpeed)   
 
     def getWidget(self):
         return super().getWidget()
