@@ -131,7 +131,6 @@ class GameMaster(QMainWindow):
         self.GameWidget = GameScreen.Ui_QtGameScreen(self.PostGame, self.Horses)
         self.setCentralWidget(self.GameWidget.getWidget())
         self.app.processEvents()
-        self.showMaximized()
         self.GameWidget.RunGame()
         
     def PostGame(self, results):
@@ -142,8 +141,8 @@ class GameMaster(QMainWindow):
     def __InitMainWindow(self):
         # Set size
         if(Settings().Debug):
-            self.resize(1000, 600)
-            self.move(300, 300)
+            self.setFixedSize(Settings().Width, Settings().Height)
+            self.move(300,300);
         else:
             self.showFullScreen()
         # Set window title

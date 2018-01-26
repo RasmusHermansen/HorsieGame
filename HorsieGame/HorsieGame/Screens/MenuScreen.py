@@ -6,7 +6,7 @@ class Ui_QtMenuScreen(BasicWidget):
 
     def __init__(self, horsesChange, startGame):
         super().__init__()
-
+        self.setupUi(self.Widget);
         self.In_HorsesNumber.valueChanged.connect(horsesChange)
         self.B_StartRun.clicked.connect(startGame)
 

@@ -1,15 +1,15 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-from Screens.BasicWidget import BasicWidget
+from Screens.BasicWidget import DynamicWidget
 from Entities.QtHorse import QtHorse
 from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import QColor, QPen
 from GameSettings import GameSettings as Settings
 import random
 
-class Ui_QtGameScreen(BasicWidget):
-    
+class Ui_QtGameScreen(DynamicWidget):
+
     def __init__(self, postGameCB, horses):
-        super().__init__()
+        super().__init__("Game")
 
         #Options
         self.UpdateSpeed = 10 #/ Framerate
@@ -187,7 +187,7 @@ class Ui_QtGameScreen(BasicWidget):
     def _GrapFinishLinePhoto(self):
         # target rect
         targetRect = self.FinishLineWidget.rect().adjusted(-500,-60,-150,-75)
-        self.FinishLinePhotos.append(self.GameView.grab(targetRect.toRect()))
+        self.FinishLinePhotos.append(self.MainView.grab(targetRect.toRect()))
 
         if(len(self.FinishLinePhotos) > 200/self.UpdateSpeed and len(self.HorsesFinished) == 0):
             self.FinishLinePhotos.pop(0)
@@ -204,41 +204,12 @@ class Ui_QtGameScreen(BasicWidget):
             horse.Obj.moveBy(self.UpdateSpeed*speed/100,0)
 
     def RunGame(self):
-        self.GameView.show()
+        self.MainView.show()
         self.T = 0
         self.timer.start(self.UpdateSpeed)   
 
     def getWidget(self):
         return super().getWidget()
-
-    def setupUi(self, Game):
-        Game.setObjectName("Game")
-        Game.showFullScreen()
-        self.horizontalLayout = QtWidgets.QHBoxLayout(Game)
-        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
-        self.horizontalLayout.setObjectName("GameLayout")
-        self.GameView = QtWidgets.QGraphicsView(Game)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.GameView.sizePolicy().hasHeightForWidth())
-        self.GameView.setSizePolicy(sizePolicy)
-        self.GameView.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.GameView.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.GameView.setViewportUpdateMode(QtWidgets.QGraphicsView.FullViewportUpdate)
-        self.GameView.setObjectName("GameView")
-        self.GameView.setContentsMargins(0,0,0,0)
-        self.horizontalLayout.addWidget(self.GameView)
-        self.Scene = QtWidgets.QGraphicsScene(Game)
-        self.Scene.setSceneRect(0,0,self.Widget.width(), self.Widget.height())
-        self.GameView.setScene(self.Scene)
-        self.retranslateUi(Game)
-        QtCore.QMetaObject.connectSlotsByName(Game)
-
-        if(Settings().AntiAliasing == 2):
-            self.GameView.setRenderHint(QtGui.QPainter.HighQualityAntialiasing)
-        elif(Settings().AntiAliasing == 1):
-            self.GameView.setRenderHint(QtGui.QPainter.Antialiasing)
 
     def retranslateUi(self, Game):
         _translate = QtCore.QCoreApplication.translate

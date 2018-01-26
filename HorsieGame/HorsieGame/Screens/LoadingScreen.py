@@ -7,6 +7,7 @@ class Ui_QtLoadingScreen(BasicWidget):
 
     def __init__(self):
         super().__init__()
+        self.setupUi(self.Widget);
 
     def getWidget(self):
         self.L_LoadingMsg.setText("Loading")
