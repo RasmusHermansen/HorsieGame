@@ -7,7 +7,8 @@ cfg.GameSettings(
             Debug = (1 if __name__ == '__main__' else 0),
             PlayMusic = True,
             PlayEffects = True,
-            MusicVolume = 70,
+            Height = 720,
+            Width = 1080,
             )
 
 

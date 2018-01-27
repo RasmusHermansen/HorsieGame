@@ -8,7 +8,7 @@ class Ui_QtWelcomeScreen(BasicWidget):
 
     def __init__(self, OnBtnPress):
         super().__init__()
-
+        self.setupUi(self.Widget);
         self.B_InitNewGame.connectClick(OnBtnPress)
 
     # SETUP UI CODE

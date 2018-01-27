@@ -146,6 +146,8 @@ class GameMaster(QMainWindow):
         if(Settings().Debug):
             self.resize(1000, 600)
             self.move(300, 300)
+            self.setFixedSize(Settings().Width, Settings().Height)
+            self.move(300,300);
         else:
             self.showFullScreen()
         # Set window title
