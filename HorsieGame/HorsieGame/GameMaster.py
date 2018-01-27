@@ -1,6 +1,7 @@
 from Databinding.Connection import ServerConnection
 from Databinding.Querier import Querier
 import sys, os, threading
+from AudioPlayer import AudioPlayer
 from GameSettings import GameSettings as Settings
 from PyQt5.QtWidgets import QWidget, QMainWindow, QLabel, QGridLayout, QSizePolicy
 from PyQt5.QtGui import QIcon, QFontDatabase, QFont
@@ -20,7 +21,7 @@ class GameMaster(QMainWindow):
             raise EnvironmentError("GameSettings Object not initialized")
         # Init Qt
         super().__init__()
-        # Init Assets
+        # Init Assets & MediaPlayer
         self._LoadAssets()
         # Init background worker
         self.timer = QTimer(self)
@@ -54,9 +55,9 @@ class GameMaster(QMainWindow):
         self.setCentralWidget(self.WelcomeWidget.getWidget())
 
     def SetToLoading(self):
+        AudioPlayer().PlayEffect('Vrinsk');
         self.LoadingWidget = LoadingScreen.Ui_QtLoadingScreen()
         self.setCentralWidget(self.LoadingWidget.getWidget())
-
 
     # Handle for btn pressed on WelcomeScreen
     def InitConnection(self):
@@ -132,6 +133,7 @@ class GameMaster(QMainWindow):
         self.setCentralWidget(self.GameWidget.getWidget())
         self.app.processEvents()
         self.showMaximized()
+        AudioPlayer().SetBackgroundTrack('LoneRanger');
         self.GameWidget.RunGame()
         
     def PostGame(self, results):
@@ -152,10 +154,14 @@ class GameMaster(QMainWindow):
         self.setWindowIcon(QIcon("Assets/Logo/Logo_64.png"))
 
     def _LoadAssets(self):
+        # Load Font
         fontId = QFontDatabase().addApplicationFont("Assets/Font/south park.ttf")
         family = QFontDatabase().applicationFontFamilies(fontId)[0]
         MainFont = QFont(family)
         self.app.setFont(MainFont)
+        
+        # Initialize media player
+        self.Audio = AudioPlayer('WindBlowing');
 
     def closeEvent(self, event):
         if(hasattr(self,"conn") and (self.conn != None)):

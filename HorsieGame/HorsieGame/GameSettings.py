@@ -1,19 +1,14 @@
-class Singleton(type):
-    _instances = {}
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
-        return cls._instances[cls]
+import Singleton;
 
-    def Instantiated(self):
-        return bool(self._instances)
-
-class GameSettings(object, metaclass=Singleton):
+class GameSettings(object, metaclass=Singleton.Singleton):
     ''' A singleton pattern implementing GameSettings '''
     # Tuple: (Required, Example Value)
     Url = (True,"Local") # The URL the game should connect to
     Debug = (False, False) # True if Debug else false
-    AntiAliasing = (False, 2) # 0 => None, 1 => Std, 2 => High
+    AntiAliasing = (False, 2) # 0 => None, 1 => Std, 2 => High 
+    PlayMusic = (True, True);
+    MusicVolume = (True, 50);
+    PlayEffects = (True, True);
 
     def __init__(self, *initial_data, **kwargs):
         # Write properties
@@ -33,6 +28,8 @@ class GameSettings(object, metaclass=Singleton):
                     raise ValueError("The property {0} is required, but was not set".format(prop))
                 # Set not required to default
                 setattr(self, prop, definition[1])
+
+        Settings = self;
 
     def __setAttr(self, key, value):
         definition = getattr(self, key)

@@ -20,6 +20,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AudioPlayer.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Databinding\Connection.py">
       <SubType>Code</SubType>
     </Compile>
@@ -60,6 +63,9 @@
     <Compile Include="GameMaster.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Singleton.py">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Assets\Logo\" />
@@ -68,9 +74,12 @@
     <Folder Include="Assets\General\" />
     <Folder Include="Assets\Font\" />
     <Folder Include="Assets\MenuBackgrounds\" />
+    <Folder Include="AudioAssets\Effects\" />
+    <Folder Include="AudioAssets\Tracks\" />
     <Folder Include="Databinding\" />
     <Folder Include="Entities\" />
     <Folder Include="Assets\" />
+    <Folder Include="AudioAssets\" />
     <Folder Include="QtExtensions\" />
     <Folder Include="Screens\" />
   </ItemGroup>
@@ -81,8 +90,11 @@
     <Content Include="Assets\Horses\JihadHorse.gif" />
     <Content Include="Assets\Horses\WhiteHorse.gif" />
     <Content Include="Assets\Horses\BlackHorse.gif" />
+    <Content Include="Assets\Horses\White_Sprite.png" />
     <Content Include="Assets\MenuBackgrounds\Welcome.gif" />
     <Content Include="Assets\MenuBackgrounds\Welcome.jpg" />
+    <Content Include="AudioAssets\Effects\Vrinsk.wav" />
+    <Content Include="AudioAssets\Tracks\WindBlowing.wav" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

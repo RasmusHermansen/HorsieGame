@@ -2,10 +2,14 @@ import GameSettings as cfg, sys, GameMaster
 from PyQt5.QtWidgets import QApplication
 
 
-settings = cfg.GameSettings(
+cfg.GameSettings(
             Url = "Local",
             Debug = (1 if __name__ == '__main__' else 0),
+            PlayMusic = True,
+            PlayEffects = True,
+            MusicVolume = 70,
             )
+
 
 # Init Qt
 app = QApplication(sys.argv)
