@@ -6,7 +6,7 @@ from GameSettings import GameSettings as Settings
 from PyQt5.QtWidgets import QWidget, QMainWindow, QLabel, QGridLayout, QSizePolicy
 from PyQt5.QtGui import QIcon, QFontDatabase, QFont
 from PyQt5.QtCore import QThread, pyqtSignal, QTimer
-from Screens import WelcomeScreen, MenuScreen, GameScreen, LoadingScreen
+from Screens import MenuScreen, GameScreen, LoadingScreen
 
 class GameMaster(QMainWindow):
 
@@ -50,7 +50,7 @@ class GameMaster(QMainWindow):
 #region WELCOMESCREEN And LOADINGSCREEN
 
     def SetToWelcome(self):
-        self.WelcomeWidget = WelcomeScreen.Ui_QtWelcomeScreen(self.InitConnection)
+        self.WelcomeWidget = MenuScreen.Ui_QtMainScreen(MenuScreen.widgetMode.WelcomeScreen);
         # Set as central widget
         self.setCentralWidget(self.WelcomeWidget.getWidget())
 

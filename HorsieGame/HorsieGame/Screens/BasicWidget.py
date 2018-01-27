@@ -19,9 +19,27 @@ class DynamicWidget(BasicWidget):
 
     def __init__(self, widgetName):
         super().__init__();
-        self.setupDynamicWindow(self.Widget, widgetName);
+        self._setupDynamicWindow(self.Widget, widgetName);
 
-    def setupDynamicWindow(self, widget, widgetName):
+        # Define timer
+        self.timer = QtCore.QTimer(self.Widget)
+        self.timer.timeout.connect(self._timerTrigger)
+        
+    def StartTimer(self, speed):
+        self.T = 0;
+        self.timer.start(speed)  
+
+    def _Update(self):
+        pass;
+
+    def _timerTrigger(self):
+        self.T += 1
+        if Settings().Debug:
+            self.TLabel.setPlainText(str(self.T))
+
+        self._Update();
+
+    def _setupDynamicWindow(self, widget, widgetName):
         widget.setObjectName(widgetName)
         
         # Create mainView
@@ -56,12 +74,15 @@ class DynamicWidget(BasicWidget):
         self.Scene.setSceneRect(0,0,self.Widget.width(), self.Widget.height())
         self.MainView.setScene(self.Scene)
         QtCore.QMetaObject.connectSlotsByName(widget)
-        
-        # Retranslate ui
-        self.retranslateUi(widget)
 
         # Set Anti aliasing based on settings
         if(Settings().AntiAliasing == 2):
             self.MainView.setRenderHint(QtGui.QPainter.HighQualityAntialiasing)
         elif(Settings().AntiAliasing == 1):
             self.MainView.setRenderHint(QtGui.QPainter.Antialiasing)
+
+        # Create Debug stuffs
+        if Settings().Debug:
+            # Create label for time
+            self.TLabel = self.Scene.addText("")
+            self.TLabel.setPos(100,100)

@@ -11,14 +11,11 @@ class Ui_QtGameScreen(DynamicWidget):
     def __init__(self, postGameCB, horses):
         super().__init__("Game")
 
-        #Options
-        self.UpdateSpeed = 10 #/ Framerate
-
+        self.UpdateSpeed = 10; 
+        
         self._constructBackground()
         self._constructHorses(horses)
         self._postGameCB = postGameCB
-        self.timer = QTimer(self.Widget)
-        self.timer.timeout.connect(self._Update)
         self.FinishLineActive = False
 
     def _constructHorses(self, horses):
@@ -44,9 +41,6 @@ class Ui_QtGameScreen(DynamicWidget):
         # Sky
         skyColor = QColor(14,171,245)
         self.Scene.addRect(0,0,self.Scene.width(),round(0.6*self.Scene.height()),pen,skyColor)
-        # TRect
-        self.TLabel = self.Scene.addText("")
-        self.TLabel.setPos(100,100)
 
         self.BackGroundEntities = []
         # Add 7 trees
@@ -78,10 +72,7 @@ class Ui_QtGameScreen(DynamicWidget):
             else:
                 item.moveBy(self.BackGroundSpeed,0)
 
-
     def _Update(self):
-        self.T += 1
-        self.TLabel.setPlainText(str(self.T))
         self._MoveHorses()
         self._ProcessBackground()
         self._CheckFinish()
@@ -142,7 +133,7 @@ class Ui_QtGameScreen(DynamicWidget):
         textLabel = self.Scene.addText("Slowmo Recap", font)
         textLabel.setPos(50, 0.35*self.Scene.height())
 
-        # Start slowmotion T
+        # Hijack timer
         self.timer.timeout.disconnect()
         self.T = 0
         self.timer.timeout.connect(lambda : self._ChangeWinningPhoto(photoObj))
@@ -186,7 +177,7 @@ class Ui_QtGameScreen(DynamicWidget):
 
     def _GrapFinishLinePhoto(self):
         # target rect
-        targetRect = self.FinishLineWidget.rect().adjusted(-500,-60,-150,-75)
+        targetRect = self.FinishLineWidget.rect().adjusted(-300,-60, 50,-75)
         self.FinishLinePhotos.append(self.MainView.grab(targetRect.toRect()))
 
         if(len(self.FinishLinePhotos) > 200/self.UpdateSpeed and len(self.HorsesFinished) == 0):
@@ -204,15 +195,11 @@ class Ui_QtGameScreen(DynamicWidget):
             horse.Obj.moveBy(self.UpdateSpeed*speed/100,0)
 
     def RunGame(self):
-        self.MainView.show()
-        self.T = 0
-        self.timer.start(self.UpdateSpeed)   
+        self.MainView.show() 
+        self.StartTimer(self.UpdateSpeed);
 
     def getWidget(self):
         return super().getWidget()
 
-    def retranslateUi(self, Game):
-        _translate = QtCore.QCoreApplication.translate
-        Game.setWindowTitle(_translate("Game", "Game"))
 
 

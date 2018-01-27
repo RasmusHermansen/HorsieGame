@@ -45,10 +45,18 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="HorsieGame.py" />
+    <Compile Include="QtExtensions\QtAnimationEngine.py" />
     <Compile Include="QtExtensions\QtLinkLabel.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="QtExtensions\QtLinkText.py" />
     <Compile Include="QtExtensions\QtSprites.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="QtExtensions\QtStaticImg.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="QtExtensions\QtTrajectory.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="QtExtensions\__init__.py">
@@ -58,6 +66,10 @@
     <Compile Include="Screens\GameScreen.py" />
     <Compile Include="Screens\LoadingScreen.py" />
     <Compile Include="Screens\MenuScreen.py" />
+    <Compile Include="Screens\MenuScreen.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Screens\OldMenuScreen.py" />
     <Compile Include="Screens\WelcomeScreen.py" />
     <Compile Include="Screens\__init__.py" />
     <Compile Include="GameMaster.py">
