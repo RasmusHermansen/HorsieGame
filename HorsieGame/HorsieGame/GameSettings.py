@@ -4,8 +4,8 @@ class GameSettings(object, metaclass=Singleton.Singleton):
     ''' A singleton pattern implementing GameSettings '''
     # Tuple: (Required, Example Value)
     Url = (True,"Local") # The URL the game should connect to
-    Height = (True, 800) # Height in resolution
-    Width = (True, 600) # Width in resolution
+    Height = (True, 1440) # Height in resolution
+    Width = (True, 810) # Width in resolution
     Debug = (False, False) # True if Debug else false
     AntiAliasing = (False, 2) # 0 => None, 1 => Std, 2 => High 
     PlayMusic = (True, True);

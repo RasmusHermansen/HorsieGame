@@ -14,7 +14,7 @@ class ServerConnection():
 
     def __ValidConnection(self, url):
         try:
-            requests.get("http://localhost:5555/", timeout=0.5)
+            requests.get(url, timeout=1)
             return True
         except requests.exceptions.ConnectionError:
             return False

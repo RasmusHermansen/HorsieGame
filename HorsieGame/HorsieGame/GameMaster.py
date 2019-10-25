@@ -26,7 +26,7 @@ class GameMaster(QMainWindow):
         # Init background worker
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.PerformUpdateFuncs)
-        self.timer.start(1000)
+        self.timer.start(2500)
         # Initialize main window
         self.__InitMainWindow()
         # Prepare Loading widget
@@ -47,51 +47,45 @@ class GameMaster(QMainWindow):
     def IterateUpdateFuncsCB(self):
         self._inPerformUpdateFuncs = False
 
-#region WELCOMESCREEN And LOADINGSCREEN
+#region WELCOMESCREEN And MENUSCREEN
 
     def SetToWelcome(self):
-        self.WelcomeWidget = MenuScreen.Ui_QtMainScreen(MenuScreen.widgetMode.WelcomeScreen);
+        self.MenuWidget = MenuScreen.Ui_QtMainScreen();
+        self.MenuWidget.SetMode(MenuScreen.widgetMode.WelcomeScreen)
+        self.MenuWidget.startNewSession.connect(self.InitConnection);
         # Set as central widget
-        self.setCentralWidget(self.WelcomeWidget.getWidget())
-
-    def SetToLoading(self):
-        AudioPlayer().PlayEffect('Vrinsk');
-        self.LoadingWidget = LoadingScreen.Ui_QtLoadingScreen()
-        self.setCentralWidget(self.LoadingWidget.getWidget())
+        self.setCentralWidget(self.MenuWidget.getWidget())       
 
     # Handle for btn pressed on WelcomeScreen
     def InitConnection(self):
-        # Set loading widget
         self.SetToLoading()
+        self.LoadingWidget.ChangeStatus("Connecting to server")
         self.worker = RunThread(self._InitConnection,self._InitConnectionCB)
 
     # The callback for _InitConnection
     def _InitConnectionCB(self, _InitConnectionResults):
-        self.conn = _InitConnectionResults[0]
-        self.GameName = _InitConnectionResults[1]
+        # Check if valid connection
+        try:
+            self.conn = _InitConnectionResults[0]
+            self.GameName = _InitConnectionResults[1]  
+            self.LoadingWidget.ChangeStatus("Setting up session")
+            # Add two horses
+            if(not hasattr(self,"Horses")):
+                self.AddOrRemoveHorses(2)
+        except Exception as e: 
+            print(e)
+            self.SetToWelcome()
+            if (_InitConnectionResults):
+                print(_InitConnectionResults)
+            else:
+                print("Failed to connect to server")
+        # SetToMenu
         self.SetToMenu()
 
     # Makes the request to Server and establishes a conn
     def _InitConnection(self):
-        self.LoadingWidget.ChangeStatus("Establishing connection to server")
         conn = Querier(ServerConnection(Settings().Url))
-        self.LoadingWidget.ChangeStatus("Instantiating new session")
         return conn, conn.InstantiateNewSession()
-    
-#endregion
-
-#region MENUSCREEN
-
-    # Initialize menu widget and set to central widget
-    def SetToMenu(self):
-        self.MenuWidget = MenuScreen.Ui_QtMenuScreen(self.AddOrRemoveHorses, self.StartGame)
-        if(not hasattr(self,"Horses")):
-            self.AddOrRemoveHorses(2)
-        else:
-            self.PopulateHorseTable()
-        self.MenuWidget.SetGameName(self.GameName)
-        self.setCentralWidget(self.MenuWidget.getWidget())
-        self._updateFuncs.append(self.GetPlayers)
 
     def AddOrRemoveHorses(self, count):
         if(not hasattr(self,"Horses")):
@@ -103,6 +97,9 @@ class GameMaster(QMainWindow):
             self.app.processEvents()
             self.Horses = self.conn.SetHorseCount(count)['Horses']
             self.PopulateHorseTable()
+
+    def AddOneHorse(self):
+        self.AddOrRemoveHorses(len(self.Horses)+1)
     
     def PopulateHorseTable(self):
         if self.Horses: # <-- True if not empty
@@ -121,23 +118,46 @@ class GameMaster(QMainWindow):
             data = [list(x.values()) for x in self.Players]
             self.MenuWidget.SetPlayers(data, header)
 
+    def SetToMenu(self):
+        self.MenuWidget = MenuScreen.Ui_QtMainScreen();
+        if hasattr(self,"GameName"):
+            self.MenuWidget.SetGameName(self.GameName)
+        self.MenuWidget.SetMode(MenuScreen.widgetMode.MenuScreen)
+        # Connect to menu screen signals
+        self.MenuWidget.addAHorse.connect(self.AddOneHorse)
+        self.MenuWidget.startNewGame.connect(self.StartGame)
+        # Start refreshing players & Populate horse table
+        self._updateFuncs.append(self.GetPlayers)
+        self.PopulateHorseTable()
+        self.setCentralWidget(self.MenuWidget.getWidget())
 #endregion 
 
 #region GameScreen
 
     def StartGame(self):
         # Set loading widget
-        self.SetToLoading()
-        self.LoadingWidget.ChangeStatus("Feeding Horses")
+        #self.SetToLoading()
+        #self.LoadingWidget.ChangeStatus("Feeding Horses (Doing Nothing)")
         self.GameWidget = GameScreen.Ui_QtGameScreen(self.PostGame, self.Horses)
         self.setCentralWidget(self.GameWidget.getWidget())
         self.app.processEvents()
-        self.showMaximized()
         AudioPlayer().SetBackgroundTrack('LoneRanger');
         self.GameWidget.RunGame()
         
     def PostGame(self, results):
+        self.ReportResults(results)
         self.SetToMenu()
+
+    def ReportResults(self, results):
+        self.conn.ReportResults([results[place].Name for place in sorted(results)])
+
+#endregion
+#region Loading screen
+
+    def SetToLoading(self):
+        AudioPlayer().PlayEffect("Vrinsk")
+        self.LoadingWidget = LoadingScreen.Ui_QtLoadingScreen()
+        self.setCentralWidget(self.LoadingWidget.getWidget())
 
 #endregion
 
@@ -176,7 +196,7 @@ class RunThread(QThread):
     Uses a pyqtSignal to alert the main thread of completion.
 
     """
-    finished = pyqtSignal([object], [int])
+    finished = pyqtSignal([object])
 
     def __init__(self, func, on_finish, *args, **kwargs):
         super(RunThread, self).__init__()
@@ -184,7 +204,6 @@ class RunThread(QThread):
         self.kwargs = kwargs
         self.func = func
         self.finished.connect(on_finish)
-        self.finished[int].connect(on_finish)
         self.start()
 
     def run(self):
@@ -194,7 +213,4 @@ class RunThread(QThread):
             print(e)
             result = e
         finally:
-            if isinstance(result, int):
-                self.finished[int].emit(result)
-            else:
-                self.finished.emit(result)
+            self.finished.emit(result)

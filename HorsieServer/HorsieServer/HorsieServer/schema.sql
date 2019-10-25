@@ -23,35 +23,24 @@ create table Horses (
   id INTEGER primary key autoincrement,
   SessionId INTEGER not null,
   Name TEXT not null,
+  HorseClass TEXT not null,
   Knot1 REAL not null,
   Knot2 REAL not null,
   Knot3 REAL not null,
   Knot4 REAL not null,
   Knot5 REAL not null,
-  Knot6 REAL not null
-);
-
-drop table if exists Actions;
-create table Actions (
-  id INTEGER primary key autoincrement,
-  SessionId INTEGER not null,
-  RunId INTEGER not null,
-  UserId INTEGER not null,
-  ActionType TEXT not null,
-  IdForActionType INTEGER not null
+  Knot6 REAL not null,
+  ProbAction1 BOOLEAN not null,
+  ProbAction2 BOOLEAN not null
 );
 
 drop table if exists Bets;
 create table Bets (
   id INTEGER primary key autoincrement,
+  SessionId INTEGER not null,
+  UserId INTEGER not null,
+  HorseId INTEGER not null,
   Odds REAL not null,
   Amount REAL not null,
-  HorseId INTEGER not null
-);
-
-drop table if exists Interactions;
-create table Interactions (
-  id INTEGER primary key autoincrement,
-  Interaction TEXT not null,
-  Value REAL not null
+  Handled BOOLEAN not null
 );

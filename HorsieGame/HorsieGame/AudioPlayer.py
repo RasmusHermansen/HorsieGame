@@ -27,7 +27,6 @@ class AudioPlayer(object, metaclass=Singleton.Singleton):
             self.TrackLibrary[song].play();
             self.CurrentTrack = song;
 
-
     def PlayEffect(self, effect):
         if(GameSettings().PlayEffects and effect in self.EffectsLibrary.keys()):
             self.EffectsLibrary[effect].play();

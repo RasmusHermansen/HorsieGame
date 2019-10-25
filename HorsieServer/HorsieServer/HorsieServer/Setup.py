@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 app.config.from_object(__name__)
 app.config.update(dict(
-    #DEBUG= True,
+    DEBUG= True,
     DATABASE= os.path.join(app.root_path, 'Horsie.db'),
     SECRET_KEY= 'fTcCO24fOIcMShAvHJ5v7TVEuEnKoaQPMLvX5PRw'
     ))

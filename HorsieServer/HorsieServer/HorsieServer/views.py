@@ -1,6 +1,8 @@
-from HorsieServer.Setup import app, request, render_template, session, flash, redirect, url_for
+from HorsieServer.Setup import app, request, render_template, session, flash, redirect, url_for, socketio
+from flask_socketio import join_room, leave_room, emit
 import HorsieServer.db as database
 import datetime, random, string
+from flask import jsonify
 
 #TODO:
 # If user has active session in game, and enter same with other name, close first session.
@@ -28,7 +30,6 @@ def login():
                 db = database.get_db()
                 db.execute('INSERT INTO Users (SessionId, UserKey, IsActive, Alias, Standing) VALUES (?,?,?,?,?)', [sessId,session['UserKey'],1,session['Alias'],10])
                 db.commit()
-                flash('You were entered in as: ' + session['Alias'])
                 return redirect(url_for('Game'))
     return render_template('index.html', error=error)
 
@@ -44,3 +45,25 @@ def Game():
     # Get tbHorses
     tbHorses = db.cursor().execute('SELECT * FROM Horses WHERE SessionId=?',[session['SessionId']]).fetchall()   
     return render_template('Game.html', tbUsers=tbUsers, tbHorses=tbHorses)
+
+@socketio.on('Place Bet')
+def AcceptBet(json):
+    print('Name and Horse ' + str(json))
+    
+@socketio.on('Join room')
+def AssignToRoom(roomId):
+    # Get info about horses:
+    print("User joined room:{0}".format(roomId))
+    join_room(str(roomId))
+    emit("HorsesChanged",GetRelevantHorsesData(roomId))
+
+@socketio.on('GetSaldo')
+def GetUserSaldo(roomId):
+    pass
+
+def BroadCastHorsesChanged(roomId):
+    print("Broadcasting to room:{0}".format(roomId))
+    socketio.emit("HorsesChanged",GetRelevantHorsesData(roomId),room=str(roomId))
+
+def GetRelevantHorsesData(roomId):
+    return [dict(x) for x in database.get_db().cursor().execute('SELECT Name FROM Horses WHERE SessionId=?',[roomId]).fetchall()]

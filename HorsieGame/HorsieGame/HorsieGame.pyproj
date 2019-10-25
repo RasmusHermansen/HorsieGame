@@ -70,7 +70,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Screens\OldMenuScreen.py" />
-    <Compile Include="Screens\WelcomeScreen.py" />
+    <Compile Include="Screens\OldWelcomeScreen.py" />
     <Compile Include="Screens\__init__.py" />
     <Compile Include="GameMaster.py">
       <SubType>Code</SubType>
@@ -99,9 +99,6 @@
     <Content Include="Assets\Background\treeOne.png" />
     <Content Include="Assets\Font\south park.ttf" />
     <Content Include="Assets\General\Loading.gif" />
-    <Content Include="Assets\Horses\JihadHorse.gif" />
-    <Content Include="Assets\Horses\WhiteHorse.gif" />
-    <Content Include="Assets\Horses\BlackHorse.gif" />
     <Content Include="Assets\Horses\White_Sprite.png" />
     <Content Include="Assets\MenuBackgrounds\Welcome.gif" />
     <Content Include="Assets\MenuBackgrounds\Welcome.jpg" />

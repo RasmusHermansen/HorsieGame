@@ -31,7 +31,6 @@ class QtLinkLabel(QtWidgets.QLabel):
                     if event.type() == QtCore.QEvent.MouseButtonRelease:
                         if obj.rect().contains(event.pos()):
                             self.clicked.emit()
-                            # The developer can opt for .emit(obj) to get the object within the slot.
                             return True
             
                 return False
@@ -39,3 +38,4 @@ class QtLinkLabel(QtWidgets.QLabel):
         filter = Filter(widget)
         widget.installEventFilter(filter)
         return filter.clicked
+    

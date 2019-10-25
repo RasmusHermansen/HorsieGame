@@ -1,4 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
+from QtExtensions import QtLinkText;
 from Screens.BasicWidget import DynamicWidget
 from Entities.QtHorse import QtHorse
 from PyQt5.QtCore import QTimer
@@ -11,7 +12,7 @@ class Ui_QtGameScreen(DynamicWidget):
     def __init__(self, postGameCB, horses):
         super().__init__("Game")
 
-        self.UpdateSpeed = 10; 
+        self.UpdateSpeed = 5; 
         
         self._constructBackground()
         self._constructHorses(horses)
@@ -102,17 +103,11 @@ class Ui_QtGameScreen(DynamicWidget):
         placementLabel.setPos(self.Scene.width()/3, 150 + displacement)
 
     def _CreateReturnToMenuButton(self):
-        returnLabel = QtWidgets.QPushButton()
-        returnLabel.setObjectName("B_ReturnToMenu")
-        returnLabel.setText("Return to Menu")
-        returnLabel.clicked.connect(lambda : self._postGameCB(self.HorsesFinished))
-        # Initialize proxy widgets
-        widget = QtWidgets.QGraphicsProxyWidget()
-        widget.setWidget(returnLabel)
-        # Add to scene
-        self.Scene.addItem(widget)
-        # Set starting position
-        widget.setPos(self.Scene.width()/2-returnLabel.width()/2, 0.85*self.Scene.height())
+        font = QtGui.QFont()
+        font.setBold(True)
+        font.setPointSize(36)
+        returnLabel = QtLinkText.QtLinkText(self.Scene,"Return to Menu",lambda : self._postGameCB(self.HorsesFinished),font)
+        returnLabel.setPos(self.Scene.width()/2, 0.85*self.Scene.height())
 
     def _DisplayWinningPhoto(self):
         # Initialise Label

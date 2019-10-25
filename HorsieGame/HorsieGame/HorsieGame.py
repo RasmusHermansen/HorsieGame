@@ -3,12 +3,12 @@ from PyQt5.QtWidgets import QApplication
 
 
 cfg.GameSettings(
-            Url = "Local",
+            Url = "http://localhost:61133", #"Local",
             Debug = (1 if __name__ == '__main__' else 0),
             PlayMusic = True,
             PlayEffects = True,
-            Height = 720,
-            Width = 1080,
+            Height = 1080,
+            Width = 1920,
             )
 
 

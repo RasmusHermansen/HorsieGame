@@ -2,7 +2,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QWidget
 from GameSettings import GameSettings as Settings
 
-class BasicWidget(object):
+class BasicWidget(QtCore.QObject):
     """ A basic widget, implement setupUi to decorate the widget """    
 
 
@@ -11,6 +11,7 @@ class BasicWidget(object):
         # Set resolution
         self.Widget.setFixedHeight(Settings().Height);
         self.Widget.setFixedWidth(Settings().Width);
+        super().__init__();
 
     def getWidget(self):
         return self.Widget
@@ -85,4 +86,5 @@ class DynamicWidget(BasicWidget):
         if Settings().Debug:
             # Create label for time
             self.TLabel = self.Scene.addText("")
-            self.TLabel.setPos(100,100)
+            self.TLabel.setZValue(10);
+            self.TLabel.setPos(25,25)

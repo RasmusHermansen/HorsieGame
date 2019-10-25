@@ -25,7 +25,7 @@ class QtAnimationEngine():
             self.loop = loop;
             self.callback = callback;
 
-            if isinstance(animation, str):
+            if isinstance(animation, (tuple, list, set)):
                 self.Sequence = True;
                 self.idx = 0;
             else:
@@ -48,7 +48,7 @@ class QtAnimationEngine():
         def _update(self):
             # If sequence update and check if last part
             if(self.Sequence):
-                if(self.animation(self.idx)._Update()):
+                if(self.animation[self.idx]._Update()):
                     self.idx = self.idx + 1;
                     if(self.idx >= len(self.animation)):
                         return True;

@@ -1,8 +1,10 @@
-from HorsieServer.Setup import app, request, abort
+from HorsieServer.Setup import app, request, abort, socketio
+from HorsieServer.views import BroadCastHorsesChanged
 import HorsieServer.db as database
 import datetime, random, string
 from scipy import interpolate
 from flask import jsonify
+
 
 # TODO:
 # REMOVE GET from methods for entire api
@@ -17,7 +19,7 @@ def CreateSession():
     counter = 0;
     while True:
         # Create SessionName
-        sessionName = random.choice(sessionNames) + str(random.randint(1,15))
+        sessionName = random.choice(sessionNames) + str(random.randint(1,100))
         # Check if it is unique and inactive
         sessId = database.ActiveSessionIdFromSessionName(sessionName)
         if(sessId == -1):
@@ -76,18 +78,25 @@ def SetHorses():
         db = database.get_db()
         # Get count of horses
         numberHorses = db.cursor().execute('SELECT COUNT(*) FROM Horses Where SessionId=?',[request.json['sessionId']]).fetchone()[0]
+        changed = False
         # add or remove horses
         if(numberHorses > desiredHorses):
             db.execute('DELETE FROM Horses WHERE id IN (SELECT id FROM Horses WHERE SessionId=? LIMIT ?)',[request.json['sessionId'],numberHorses-desiredHorses])
             db.commit()
+            changed = True
         elif(numberHorses < desiredHorses):
             horseNames = ("Tarok", "Tarok1", "TArok2", "Mustafa", "Donkey", "1949", "DenSorteDød", "HvorDuFra")
             for i in range(0,desiredHorses - numberHorses):
-                db.execute('INSERT INTO Horses (SessionId, Name, Knot1, Knot2, Knot3, Knot4, Knot5, Knot6) VALUES (?,?,?,?,?,?,?,?)', 
-	                            [request.json['sessionId'],random.choice(horseNames)] + GenerateHorseKnots())
+                db.execute('INSERT INTO Horses (SessionId, Name, HorseClass, Knot1, Knot2, Knot3, Knot4, Knot5, Knot6, ProbAction1, ProbAction2) VALUES (?,?,?,?,?,?,?,?,?,?,?)', 
+	                            [request.json['sessionId'],random.choice(horseNames),"Basic"] + GenerateHorseKnots() + ["0","0"])
                 db.commit()
+            changed = True
+
         # Get horses
-        tbl_Horses = db.cursor().execute('SELECT Name, Knot1, Knot2, Knot3, Knot4, Knot5, Knot6 FROM Horses Where SessionId=?',[request.json['sessionId']]).fetchall()
+        tbl_Horses = db.cursor().execute('SELECT Name, HorseClass, Knot1, Knot2, Knot3, Knot4, Knot5, Knot6, ProbAction1, ProbAction2 FROM Horses Where SessionId=?',[request.json['sessionId']]).fetchall()
+
+        if changed:
+            BroadCastHorsesChanged(request.json['sessionId'])
         
         return jsonify({'Horses':[dict(x) for x in tbl_Horses]})
     
@@ -96,7 +105,7 @@ def GetAllPlayers():
     if(_ValidRequest(request)):
         # Init db
         db = database.get_db()
-        # Get all active players frm game
+        # Get all active players from game
         tbl_Players = db.cursor().execute('SELECT Alias, Standing FROM Users Where SessionId=?',[request.json['sessionId']]).fetchall()
         
         return jsonify({'Players':[dict(x) for x in tbl_Players]})
@@ -117,3 +126,4 @@ def GetAllBets():
     bets = db.cursor().execute('SELECT ActionId FROM Actions WHERE SessionId=?',[session['SessionId']]).fetchall()
 
     return jsonify({'Closed': True})
+
