@@ -27,6 +27,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="HorsieServer\HorseClasses.py" />
     <Compile Include="HorsieServer\WebApi.py">
       <SubType>Code</SubType>
     </Compile>
@@ -62,8 +63,10 @@
     <Content Include="HorsieServer\static\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="HorsieServer\static\fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="HorsieServer\static\fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="HorsieServer\static\fonts\south-park.ttf">
+      <Publish>True</Publish>
+    </Content>
     <Content Include="HorsieServer\static\Scripts\Game.js" />
-    <Content Include="HorsieServer\static\Scripts\GameInfoToggle.js" />
     <Content Include="HorsieServer\templates\index.html" />
     <Content Include="HorsieServer\templates\layout.html" />
   </ItemGroup>

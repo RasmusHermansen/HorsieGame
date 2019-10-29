@@ -31,7 +31,8 @@ create table Horses (
   Knot5 REAL not null,
   Knot6 REAL not null,
   ProbAction1 BOOLEAN not null,
-  ProbAction2 BOOLEAN not null
+  ProbAction2 BOOLEAN not null,
+  Odds REAL not null
 );
 
 drop table if exists Bets;

@@ -15,8 +15,10 @@ def login():
         if(len(request.form['Alias'])==0):
             error="Empty Alias"
         else:
+            # sessionId
+            sessionId = request.form['SessionId'].upper()
             # Check existence and activity of session
-            sessId = database.ActiveSessionIdFromSessionName(request.form['SessionId'])
+            sessId = database.ActiveSessionIdFromSessionName(sessionId)
             if(sessId == -1):
                 error="No live sessions with that id"
             # Check if Alias already active in session or same sessionKey
@@ -33,37 +35,81 @@ def login():
                 return redirect(url_for('Game'))
     return render_template('index.html', error=error)
 
-# Temp for dev
+# Check session information and show game screen (!!!!Should be triggered by relog instead of /Game!!!!!!!)
 @app.route('/Game')
 def Game():
-    # Check Session
-    if(not database.SessionActive(session['SessionId'])):
-        return render_template('index.html', error="Inactive session supplied")
-    # Get Users
+    if(len(session['Alias'])==0):
+        error="Empty Alias"
+    else:
+        # Check existence and activity of session
+        sessId = database.ActiveSessionIdFromSessionName(session['SessionId'])
+        if(sessId == -1):
+            error="No live sessions with that id"
+        # Check if Alias already active in session or same sessionKey
+        elif(not database.AllowUserToEnterActiveSession(sessId, session['Alias'], session['UserKey'] if 'UserKey' in session else "")):
+            error="A user already has that Alias(Username) in that Session"
+    return render_template('Game.html')
+
+
+@socketio.on('Bet')
+def AcceptBet(data):
+    horseId = data['horse']
+    amount = data['amount']
     db = database.get_db()
-    tbUsers = db.cursor().execute('SELECT * FROM Users WHERE SessionId=?',[session['SessionId']]).fetchall()
-    # Get tbHorses
-    tbHorses = db.cursor().execute('SELECT * FROM Horses WHERE SessionId=?',[session['SessionId']]).fetchall()   
-    return render_template('Game.html', tbUsers=tbUsers, tbHorses=tbHorses)
-
-@socketio.on('Place Bet')
-def AcceptBet(json):
-    print('Name and Horse ' + str(json))
-    
-@socketio.on('Join room')
-def AssignToRoom(roomId):
-    # Get info about horses:
-    print("User joined room:{0}".format(roomId))
-    join_room(str(roomId))
-    emit("HorsesChanged",GetRelevantHorsesData(roomId))
-
-@socketio.on('GetSaldo')
-def GetUserSaldo(roomId):
+    # Check Odds
+    odds = db.cursor().execute('SELECT Odds FROM Horses WHERE SessionId=? AND id=?',[session['SessionId'],horseId]).fetchone()[0]
+    # Get user id
+    id = db.cursor().execute('SELECT id FROM Users WHERE SessionId=? AND alias=?',[session['SessionId'],session['Alias']]).fetchone()[0]
+    # Check Standing
+    standing = GetUserStanding(session['SessionId'],id)
+    # Accept bet (!!! Set a timer for minimum time between bets? !!!)
+    if standing > amount:
+        # Update standing
+        UpdateUserStanding(session['SessionId'], id, -amount,standing)
+        # Register bet
+        db = database.get_db()
+        db.execute('INSERT INTO Bets (SessionId, UserId, HorseId, Odds, Amount, Handled) VALUES (?,?,?,?,?,?)', 
+	                    [session['SessionId'], id, horseId,  odds, amount, False])
+        db.commit()
+        # Update the users saldo information
+        ProvideSaldoInformation()
     pass
 
-def BroadCastHorsesChanged(roomId):
-    print("Broadcasting to room:{0}".format(roomId))
-    socketio.emit("HorsesChanged",GetRelevantHorsesData(roomId),room=str(roomId))
 
+@socketio.on('Join room')
+def AssignToRoom():
+    # Get info about horses:
+    join_room(str(session['SessionId']))
+    emit("HorsesChanged",GetRelevantHorsesData(session['SessionId']))
+    emit("OddsChanged",GetReleveantOddsData(session['SessionId']))
+    ProvideSaldoInformation()
+
+def ProvideSaldoInformation():
+    emit("SaldoChanged", str(GetUserStandingByAlias(session['SessionId'],session['Alias'])))
+
+def BroadCastOddsChanged(roomId):
+    socketio.emit("HorsesChanged",GetReleveantOddsData(roomId),room=str(roomId))
+
+def BroadCastHorsesChanged(roomId):
+    socketio.emit("HorsesChanged",GetRelevantHorsesData(roomId),room=str(roomId))
+    BroadCastOddsChanged(roomId)
+
+# Move below functions into DB ?
 def GetRelevantHorsesData(roomId):
-    return [dict(x) for x in database.get_db().cursor().execute('SELECT Name FROM Horses WHERE SessionId=?',[roomId]).fetchall()]
+    return [dict(x) for x in database.get_db().cursor().execute('SELECT id, Name FROM Horses WHERE SessionId=?',[roomId]).fetchall()]
+
+def GetReleveantOddsData(roomId):
+    return [dict(x) for x in database.get_db().cursor().execute('SELECT id, Odds FROM Horses WHERE SessionId=?',[roomId]).fetchall()]
+
+def GetUserStandingByAlias(sessionId, alias):
+    return database.get_db().cursor().execute('SELECT Standing FROM Users WHERE SessionId=? AND Alias=?',[sessionId,alias]).fetchone()[0]
+
+def GetUserStanding(sessionId, id):
+    return database.get_db().cursor().execute('SELECT Standing FROM Users WHERE SessionId=? AND id=?',[sessionId,id]).fetchone()[0]
+
+def UpdateUserStanding(sessionId, id, change, current = None):
+    db = database.get_db()
+    if not current:
+        current = GetUserStandingWithID(sessionId, id)
+    db.cursor().execute("UPDATE Users SET Standing = ? WHERE SessionId=? AND id=?",[current + change,sessionId,id])
+    db.commit()

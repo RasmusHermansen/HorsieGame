@@ -1,5 +1,6 @@
 from HorsieServer.Setup import app, request, abort, socketio
 from HorsieServer.views import BroadCastHorsesChanged
+from HorsieServer.HorseClasses import HorseClasses
 import HorsieServer.db as database
 import datetime, random, string
 from scipy import interpolate
@@ -12,7 +13,7 @@ from flask import jsonify
 @app.route('/Game/api/v1.0/CreateSession', methods=['GET','POST'])
 def CreateSession():
     #replace sessionNames with valid generator
-    sessionNames = ("Memes", "Krugge", "BaNAn", "wololo", "brikken", "kony")
+    sessionNames = ("KONY","PONY")
     
     sessionName = ""
     # Iterate new SessionNames untill valid
@@ -70,26 +71,41 @@ def GenerateHorseKnots():
     Knot6 = random.normalvariate(13,4)
     return [Knot1, Knot2, Knot3, Knot4, Knot5, Knot6]
 
+def GetHorseClass(currentClasses):
+    # Instead subset the HorseClasses and choose from subset
+    horse = random.choice(HorseClasses)
+    while currentClasses and horse['Name'] in currentClasses:
+        horse = random.choice(HorseClasses)
+    return horse['Name']
+
 @app.route('/Game/api/v1.0/SetHorses', methods=['GET','POST'])
 def SetHorses():
     if(_ValidRequest(request)):
         desiredHorses = request.json['horsesCount']
+        # Trim to current maximum number of different horses
+        desiredHorses = min(desiredHorses, len(HorseClasses))
+
         # Init db
         db = database.get_db()
         # Get count of horses
         numberHorses = db.cursor().execute('SELECT COUNT(*) FROM Horses Where SessionId=?',[request.json['sessionId']]).fetchone()[0]
         changed = False
+
         # add or remove horses
         if(numberHorses > desiredHorses):
             db.execute('DELETE FROM Horses WHERE id IN (SELECT id FROM Horses WHERE SessionId=? LIMIT ?)',[request.json['sessionId'],numberHorses-desiredHorses])
             db.commit()
             changed = True
         elif(numberHorses < desiredHorses):
-            horseNames = ("Tarok", "Tarok1", "TArok2", "Mustafa", "Donkey", "1949", "DenSorteDød", "HvorDuFra")
+            # Gt currently taken classes
+            currentHorses = db.cursor().execute('SELECT HorseClass FROM Horses Where SessionId=?',[request.json['sessionId']]).fetchall()
+            # Add new horses 
             for i in range(0,desiredHorses - numberHorses):
-                db.execute('INSERT INTO Horses (SessionId, Name, HorseClass, Knot1, Knot2, Knot3, Knot4, Knot5, Knot6, ProbAction1, ProbAction2) VALUES (?,?,?,?,?,?,?,?,?,?,?)', 
-	                            [request.json['sessionId'],random.choice(horseNames),"Basic"] + GenerateHorseKnots() + ["0","0"])
+                horseClass = GetHorseClass(currentHorses)
+                db.execute('INSERT INTO Horses (SessionId, Name, HorseClass, Knot1, Knot2, Knot3, Knot4, Knot5, Knot6, ProbAction1, ProbAction2, Odds) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)', 
+	                            [request.json['sessionId'], horseClass, horseClass] + GenerateHorseKnots() + ["0","0","0"])
                 db.commit()
+                currentHorses.append(horseClass)
             changed = True
 
         # Get horses

@@ -1,54 +1,18 @@
 {% extends "layout.html" %}
 {% block body %}
 <script type=text/javascript src="{{ url_for('static', filename='Scripts/Game.js') }}"></script>
-<script type=text/javascript src="{{ url_for('static', filename='Scripts/GameInfoToggle.js') }}"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
 
-<button id="GameInfoToggleBtn" style="float:left" type="button">ToggleGameInfo</button>
 <div class="container gameContainer">
     <div class="row">
         <div class="col-md-6 col-sm-12">
-            <div id="horses">
-
+            <div class="headerBar">
+                <div class="headerlabel"><span>Alias</span> <span class="pull-right">Standing</span></div>
+                <h2><span id="alias">{{ session.Alias }}</span><span id="Standing" class="pull-right">N/A</span></h2>
             </div>
+            
+            <ul id="horses" class="list-group"></ul>
         </div>
     </div>
 </div>
-<!-- CBA -->
-<div id="SessionId" style="display:none">{{ session.SessionId }}</div>
-<div id="Alias" style="display:none">{{ entry.Alias }}</div>
-<!--DEV GAMEINFO TOGGLE-->
-<div class="container gameContainer" style="display:none">
-    <div class="row shadedAndWhite">
-        <div class="col-md-4">
-            <h1>SocketIO:</h1>
-            <p id="SocketOutput"></p>
-        </div>
-        <div class="col-md-4">
-            <h1>All Players</h1>
-            <ul>
-                {% for entry in tbUsers %}
-                <li>
-                    <strong>Alias:</strong>{{ entry.Alias }}<br /><strong>Standing:</strong>{{ entry.Standing }}
-                    {% else %}
-                <li>
-                    <em>No Users given the current session id: {{ session.SessionId }}</em>
-                    {% endfor %}
-            </ul>
-        </div>
-        <div class="col-md-4">
-            <h1>Horses</h1>
-            <ul>
-                {% for entry in tbHorses %}
-                <li>
-                    <strong>Name:</strong>{{ entry.Name }}<br />
-                    {% else %}
-                <li>
-                    <em>No Horses given the current session id: {{ session.SessionId }}</em>
-                    {% endfor %}
-            </ul>
-        </div>
-    </div>
-</div>
-<!--DEV END-->
 {% endblock %}

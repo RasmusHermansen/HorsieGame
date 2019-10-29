@@ -11,108 +11,196 @@ table, caption, tbody, tfoot, thead, tr, th, td,
 article, aside, canvas, details, embed,
 figure, figcaption, footer, header, hgroup,
 menu, nav, output, ruby, section, summary,
-time, mark, audio, video {
+time, mark, audio, video, button, input {
     margin: 0;
     padding: 0;
     border: 0;
     font-size: 100%;
-    font: inherit;
+    font-family: SouthPark;
     vertical-align: baseline;
 }
-/* HTML5 display-role reset for older browsers */
-article, aside, details, figcaption, figure,
-footer, header, hgroup, menu, nav, section {
-    display: block;
+
+:root {
+    --input-padding-x: 2rem;
+    --input-padding-y: 1.5rem;
 }
 
 body {
-    line-height: 1;
+    background: #161616;
 }
 
-ol, ul {
-    list-style: none;
-}
-
-blockquote, q {
-    quotes: none;
-}
-
-    blockquote:before, blockquote:after,
-    q:before, q:after {
-        content: '';
-        content: none;
-    }
-
-table {
-    border-collapse: collapse;
-    border-spacing: 0;
+.greenDot {
+    color: #86BC25;
+    font-size: 150%;
 }
 
 
-
-/*STYLING GOES BELOW*/
-/*LOGIN FORM*/
-
-#form-title{
-
-font-size: 2em;
-font-weight: 700;
-
-}
-.login-Wrap {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 80px 0;
-    height: 400px;
-    text-align: center;
-}
-form {
-    padding: 20px 0;
-    position: relative;
-    
-}
-input {
-    display: block;
-    appearance: none;
-    outline: 0;
-    border: 1px solid fade(white, 40%);
-    background-color: fade(white, 20%);
-    width: 250px;
-    border-radius: 3px;
-    padding: 10px 15px;
-    margin: 0 auto 10px auto;
-    display: block;
-    text-align: center;
-    font-size: 18px;
-    color: black;
-    transition-duration: 0.25s;
-    font-weight: 300;
-}
-input:hover{
-    background-color: fade(white, 40%);
+.btn:hover {
+    background-color: #86BC25;
+    border-color: #86BC25;
 }
 
-input:focus {
-    background-color: white;
-    width: 300px;
-    color: black;
-}
-
-
-.btn {
-    appearance: none;
-    outline: 0;
-    background-color: lightgreen;
+.card-signin {
     border: 0;
-    padding: 10px 15px;
-    color: black;
-    border-radius: 3px;
-    width: 250px;
-    cursor: pointer;
-    font-size: 18px;
-    transition-duration: 0.25s;
+    border-radius: 1rem;
+    box-shadow: 0 0.5rem 1rem 0 rgba(0, 0, 0, 0.1);
 }
-    btn:hover {
-        background-color: rgb(245, 247, 249);
-    }
 
+.card-signin .card-title {
+    margin-bottom: 2rem;
+    font-weight: 500;
+    font-size: 2rem;
+}
+
+.card-signin .card-body {
+    padding: 2rem;
+}
+
+.form-signin {
+    width: 100%;
+}
+
+.btn-lg {
+    padding: 1.5rem;
+}
+
+.form-control {
+    border-width: 5px;
+}
+
+.form-signin .btn {
+
+    border-radius: 5rem;
+    letter-spacing: .1rem;
+    font-weight: bold;
+    padding: 1rem;
+    transition: all 0.2s;
+}
+
+.form-label-group {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.form-label-group input {
+    height: auto;
+    border-radius: 2rem;
+}
+
+.form-label-group > input,
+.form-label-group > label {
+    padding: var(--input-padding-y) var(--input-padding-x);
+}
+
+.form-label-group > label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    width: 100%;
+    margin-bottom: 0;
+    /* Override default `<label>` margin */
+    line-height: 1.5;
+    color: #495057;
+    border: 1px solid transparent;
+    border-radius: .25rem;
+    transition: all .1s ease-in-out;
+    font-size:150%;
+}
+
+.form-label-group > input {
+    font-size:150%;
+}
+
+.form-label-group input::-webkit-input-placeholder {
+    color: transparent;
+}
+
+.form-label-group input:-ms-input-placeholder {
+    color: transparent;
+}
+
+.form-label-group input::-ms-input-placeholder {
+    color: transparent;
+}
+
+.form-label-group input::-moz-placeholder {
+    color: transparent;
+}
+
+.form-label-group input::placeholder {
+    color: transparent;
+}
+
+.form-label-group input:not(:placeholder-shown) {
+    padding-top: calc(var(--input-padding-y) + var(--input-padding-y) * (2 / 3));
+    padding-bottom: calc(var(--input-padding-y) / 3);
+}
+
+.form-label-group input:not(:placeholder-shown) ~ label {
+    padding-top: calc(var(--input-padding-y) / 3);
+    padding-bottom: calc(var(--input-padding-y) / 3);
+    font-size: 14px;
+    color: #777;
+}
+
+.error {
+    color: #c72c21;
+}
+
+.btn-bet {
+    height:3em;
+    width:3em;
+    margin-left:0.5em;
+}
+
+.btn-bet:active {
+    background-color:chartreuse;
+}
+
+.headerlabel {
+    font-size:50%;
+    color:grey;
+    display:block;
+}
+
+.list-group-item {
+    margin-bottom: 0.05em;
+    border-color: black;
+    border-width: 2px;
+    display: block;
+    height:4.5em;
+}
+
+.horse-icon {
+    border-radius:50%;
+    height:3em;
+    width:3em;
+}
+
+.headerBar {
+    background-color: white;
+    border-bottom: medium solid #86BC25;
+    padding-top: 0.5rem;
+    padding-left:1em;
+    padding-right:1em;
+    margin-bottom: 0.25em;
+    display: block;
+}
+
+.pull-right {
+    float: right;
+}
+
+.horse-name{
+    vertical-align:top;
+}
+
+.horse-details {
+    display:inline-block;
+    vertical-align:top;
+}
+
+.odds {
+    margin-left:3em;
+}

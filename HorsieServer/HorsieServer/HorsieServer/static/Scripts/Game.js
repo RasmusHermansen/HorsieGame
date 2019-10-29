@@ -1,35 +1,66 @@
 
 
-function SetHorsesAndOdds(horsesAndOdds) {
+function SetHorses(horses, socket) {
     $("#horses").empty()
-    horsesAndOdds.forEach(function (horse) {
+    horses.forEach(function (horse) {
         $("#horses").append(
-            `<div id="HorseNamed${horse.Name}" class="row horse">
-                <img height="50" class="horseImg" src="https://images2.minutemediacdn.com/image/upload/c_crop,h_1194,w_2121,x_0,y_34/f_auto,q_auto,w_1100/v1553786510/shape/mentalfloss/539787-istock-879570436.jpg"></img> <span>${horse.Name}</span>
-            </div>`)
+            `<li class="list-group-item">
+            <img class="horse-icon" src="https://hotemoji.com/images/emoji/l/7tzudlpkm9sl.png">
+            <div class="horse-details">
+                <span>${horse.Name}</span>
+                <br>
+                <span class="odds" id="odds-${horse.id}">N/A</span>
+            </div>
+            <button id="btn-bet-large-${horse.id}" type="button" class="btn btn-secondary btn-bet pull-right">5</button>
+            <button id="btn-bet-small-${horse.id}" type="button" class="btn btn-secondary btn-bet pull-right">1</button></li>`)
+        $(`#btn-bet-large-${horse.id}`).click(function () {
+            BetOnHorse(horse.id,5, socket)
+        });
+        $(`#btn-bet-small-${horse.id}`).click(function () {
+            BetOnHorse(horse.id, 1, socket)
+        });
     });
+    Sortable.create(document.getElementById('horses'), {
+        animation: 100,
+        draggable: '.list-group-item',
+        handle: '.list-group-item'
+    });
+}
+
+function UpdateOdds(odds) {
+    odds.forEach(function (oddAndHorse) {
+        $(`#odds-${oddAndHorse.id}`).text(oddAndHorse.Odds)
+    });
+}
+
+function SetSaldo(saldo) {
+    $("#Standing").text(saldo);
+}
+
+function BetOnHorse(horse, amount, socket) {
+    socket.emit('Bet', {
+        'horse': horse,
+        'amount': amount
+    })
 }
 
 $(function () {
     // Get that socketIo
     var socket = io();
     socket.on('connect', function () {
-        socket.emit('Join room', $("#SessionId").text());
+        socket.emit('Join room');
     });
 
-    socket.on('Odds', function () {
-        SetHorsesAndOdds
+    socket.on('OddsChanged', function (odds) {
+        UpdateOdds(odds)
     })
 
     socket.on('HorsesChanged', function (data) {
-        console.log("HorsesChanged triggered")
-        console.log(data)
-        SetHorsesAndOdds(data)
+        // dirty and bad to pass socket :/
+        SetHorses(data, socket)
     })
 
-    socket.on('Saldo', function (data) {
-        console.log("")
-        console.log(data)
-        SetSaldo(data)
+    socket.on('SaldoChanged', function (saldo) {
+        SetSaldo(saldo)
     })
 })
