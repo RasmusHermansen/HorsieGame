@@ -5,11 +5,11 @@ class QtSimpleText(QtWidgets.QGraphicsTextItem):
     ''' Enables centered = true '''
 
     def __init__(self, scene, text, font = QtGui.QFont(), centered = True,**kwargs):
-        super().__init__(**kwargs)
-
-        self.setPlainText(text);
-        self.setFont(font);
-        scene.addItem(self);
+        if (scene):
+            super().__init__(**kwargs)
+            self.setPlainText(text);
+            self.setFont(font);
+            scene.addItem(self);
 
     def pos(self):
         real = super().pos()
@@ -33,7 +33,7 @@ class QtLinkText(QtSimpleText):
         return super().mousePressEvent(QGraphicsSceneMouseEvent)
 
     def hoverEnterEvent(self, QGraphicsSceneHoverEvent):
-        self.setDefaultTextColor(QtGui.QColor(255, 255, 0))
+        self.setDefaultTextColor(QtGui.QColor(134, 188, 37))
         return super().hoverEnterEvent(QGraphicsSceneHoverEvent)
 
     def hoverLeaveEvent(self, QGraphicsSceneHoverEvent):

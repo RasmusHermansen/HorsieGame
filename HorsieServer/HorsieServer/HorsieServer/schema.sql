@@ -46,3 +46,13 @@ create table Bets (
   Amount REAL not null,
   Handled BOOLEAN not null
 );
+
+drop table if exists Drinks;
+create table Drinks (
+  id INTEGER primary key autoincrement,
+  SessionId INTEGER not null,
+  FromUserId INTEGER not null,
+  ToUserId INTEGER not null,
+  Drink INTEGER not null,
+  Dealt BOOLEAN not null
+);

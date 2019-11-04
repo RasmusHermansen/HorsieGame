@@ -100,11 +100,6 @@ class GameMaster(QMainWindow):
         self.Horses = horses
         self.PopulateHorseTable()
 
-    def RefreshHorses(self):
-        count = len(self.Horses)
-        self.AddOrRemoveHorses(0)
-        self.AddOrRemoveHorses(count)
-
     def AddOneHorse(self):
         self.AddOrRemoveHorses(len(self.Horses)+1)
 
@@ -121,12 +116,27 @@ class GameMaster(QMainWindow):
         if(not hasattr(self,"Players")):
             self.Players = []
 
-        self.app.processEvents()
         self.Players = self.conn.GetPlayers()['Players']
         if self.Players: # <-- True if not empty
             header = list(self.Players[0].keys())
             data = [list(x.values()) for x in self.Players]
             self.MenuWidget.SetPlayers(data, header)
+
+    def GetDrinks(self):
+        if(not hasattr(self,"Drinks")):
+            self.Drinks = []
+
+        self.Drinks = self.conn.GetDrinks()['Drinks']
+        if self.Drinks: # <-- True if not empty
+            header = list(self.Drinks[0].keys())
+            data = [list(x.values()) for x in self.Drinks]
+            self.MenuWidget.SetDrinks(data, header, self.ClearDrink)
+        else:
+            self.MenuWidget.ClearDrinks()
+
+    def ClearDrink(self, drinkId):
+        print("Clearing drink:{0}".format(drinkId))
+        self.worker = RunThread(lambda: self.conn.DealDrink(drinkId))
 
     def SetToMenu(self):
         self.MenuWidget = MenuScreen.Ui_QtMainScreen();
@@ -135,9 +145,14 @@ class GameMaster(QMainWindow):
         self.MenuWidget.SetMode(MenuScreen.widgetMode.MenuScreen)
         # Connect to menu screen signals
         self.MenuWidget.addAHorse.connect(self.AddOneHorse)
+        #self.MenuWidget.refreshHorses.connect(self.RefreshHorses)
+        self.MenuWidget.removeAHorse.connect(self.RemoveOneHorse)
+        self.MenuWidget.clearADrink.connect(self.ClearDrink)
         self.MenuWidget.startNewGame.connect(self.StartGame)
         # Start refreshing players & Populate horse table
+        self._updateFuncs.append(self.app.processEvents)
         self._updateFuncs.append(self.GetPlayers)
+        self._updateFuncs.append(self.GetDrinks)
         self.PopulateHorseTable()
         self.setCentralWidget(self.MenuWidget.getWidget())
 #endregion 
@@ -147,14 +162,16 @@ class GameMaster(QMainWindow):
         # Set loading widget
         #self.SetToLoading()
         #self.LoadingWidget.ChangeStatus("Feeding Horses (Doing Nothing)")
+        self.app.processEvents()
         self.GameWidget = GameScreen.Ui_QtGameScreen(self.PostGame, self.Horses, self.DisableBetting)
         self.setCentralWidget(self.GameWidget.getWidget())
         self.app.processEvents()
         AudioPlayer().SetBackgroundTrack('LoneRanger');
-        # TODO: Remove "GetPlayers.." from UpdateFuncs (add in post game)
+        self.timer.stop()
         self.GameWidget.RunGame()
         
     def PostGame(self, results):
+        self.timer.start(2500)
         self.ReportResults(results)
         self.SetToMenu()
 

@@ -178,12 +178,18 @@ body {
     width:4em;
 }
 
+.view-toggle {
+    height:3em;
+    width:3em;
+    margin-left:1em;
+}
+
 .headerBar {
     background-color: white;
     border-bottom: medium solid #86BC25;
     padding-top: 0.5rem;
-    padding-left:1em;
-    padding-right:1em;
+    padding-left: 1em;
+    padding-right: 1em;
     margin-bottom: 0.5em;
     display: block;
 }
@@ -191,6 +197,7 @@ body {
 .pull-right {
     float: right;
 }
+
 
 .horse-name{
     vertical-align:top;
@@ -221,6 +228,24 @@ body {
 
 .ThirdPlace {
     border: medium solid #cd7f32;
+}
+
+.Player-Alias {
+    font-size:150;
+}
+
+.list-group-item-drink {
+    margin-bottom: 0.20em;
+    border-color: black;
+    border-width: 2px;
+    display: block;
+    background-color:white;
+    padding:0.5em;
+}
+
+.btn-drink {
+    margin-left: 1.5em;
+    width: auto;
 }
 
 @media (max-width: 1000px) {

@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QApplication
 
 
 cfg.GameSettings(
-            Url = "http://localhost:61309", # "Local",
+            Url = "http://localhost:51069", # "Local",
             Debug = (1 if __name__ == '__main__' else 0),
             PlayMusic = True,
             PlayEffects = True,

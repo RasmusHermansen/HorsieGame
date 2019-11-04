@@ -122,86 +122,79 @@ def GetAllPlayers():
         # Init db
         db = database.get_db()
         # Get all active players from game
-        tbl_Players = db.cursor().execute('SELECT Alias, Standing FROM Users Where SessionId=?',[request.json['sessionId']]).fetchall()
+        tbl_Players = db.cursor().execute('SELECT Alias, Standing, id FROM Users Where SessionId=? AND IsActive=?',[request.json['sessionId'],True]).fetchall()
         
         return jsonify({'Players':[dict(x) for x in tbl_Players]})
+
+@app.route('/Game/api/v1.0/DrinksDealt', methods=['GET','POST'])
+def DrinksDealt():
+    if(_ValidRequest(request)):
+        # Init db
+        db = database.get_db()
+        # Set all drinks as dealt
+        db.execute('UPDATE Drinks SET Dealt=? WHERE id=? AND SessionId=?', [True, request.json['drinkId'], request.json['sessionId']])
+        db.commit()
+        return jsonify({'Handled':True})
+
+@app.route('/Game/api/v1.0/GetDrinks', methods=['GET','POST'])
+def GetDealtDrinks():
+    if(_ValidRequest(request)):
+        # Init db
+        db = database.get_db()
+        # Get all unhandled drinks
+        drinks = db.cursor().execute('SELECT id, FromUserId, ToUserId, Drink FROM Drinks Where SessionId=? AND Dealt=?',[request.json['sessionId'],False]).fetchall()
+        # Return
+        return jsonify({'Drinks':[dict(x) for x in drinks]})
 
 @app.route('/Game/api/v1.0/GetActiveBets', methods=['GET','POST'])
 def GetAllBets():
     raise NotImplementedError()
-    if not request.json:
-        abort(400)
-    sessId = request.json['sessionId']
-    sessKey = request.json['sessionKey']
-    # Check if it is active and correct key
-    if(not database.SessionActive(sessId) or not database.CorrectSessionKey(sessId, sessKey)):
-        raise ConnectionRefusedError("Inactive sessionId or invalid sessionKey")
-    # Make query
-
-    return jsonify({'Closed': True})
 
 @app.route('/Game/api/v1.0/ReportResults', methods=['GET','POST'])
 def ReportResults():
-    if not request.json:
-        abort(400)
-    sessId = request.json['sessionId']
-    sessKey = request.json['sessionKey']
-    # Check if it is active and correct key
-    if(not database.SessionActive(sessId) or not database.CorrectSessionKey(sessId, sessKey)):
-        raise ConnectionRefusedError("Inactive sessionId or invalid sessionKey")
+    if(_ValidRequest(request)):    
+        sessId = request.json['sessionId']
+
+        db = database.get_db()
+        # Get unhandled all bets
+        bets = db.cursor().execute('SELECT UserId, HorseId, Odds, Amount FROM Bets WHERE SessionId=? AND Handled=?',[sessId,False]).fetchall()
     
-    db = database.get_db()
-    # Get unhandled all bets
-    bets = db.cursor().execute('SELECT UserId, HorseId, Odds, Amount FROM Bets WHERE SessionId=? AND Handled=?',[sessId,False]).fetchall()
-    
-    # Make all unhandled bets handled
-    db.execute('UPDATE Bets SET Handled=? WHERE SessionId=?', [True,sessId])
-    db.commit()
+        # Make all unhandled bets handled
+        db.execute('UPDATE Bets SET Handled=? WHERE SessionId=?', [True,sessId])
+        db.commit()
 
-    # Reward winners (Should aggregate)
-    for row in bets:
-        if row['HorseId'] == request.json['results'][0]:
-            UpdateUserStanding(sessId, row['UserId'], row['Odds']*row['Amount'])
+        # Reward winners (Should aggregate)
+        for row in bets:
+            if row['HorseId'] == request.json['results'][0]:
+                UpdateUserStanding(sessId, row['UserId'], row['Odds']*row['Amount'])
 
-    BroadCastRaceOver(sessId, request.json['results'][:3])
+        BroadCastRaceOver(sessId, request.json['results'][:3])
 
-    # Re-enable betting
-    SetBettingState(True, sessId)
+        # Re-enable betting
+        SetBettingState(True, sessId)
 
-    return jsonify({'Handled':True})
+        return jsonify({'Handled':True})
 
 @app.route('/Game/api/v1.0/DisableBetting', methods=['GET','POST'])
 def DisableBetting():
-    if not request.json:
-        abort(400)
-    sessId = request.json['sessionId']
-    sessKey = request.json['sessionKey']
+    if(_ValidRequest(request)):
+        sessId = request.json['sessionId']
 
-    # Check if it is active and correct key
-    if(not database.SessionActive(sessId) or not database.CorrectSessionKey(sessId, sessKey)):
-        raise ConnectionRefusedError("Inactive sessionId or invalid sessionKey")
+        SetBettingState(False, sessId)
 
-    SetBettingState(False, sessId)
+        BroadCastBettingDisabled(sessId)
 
-    BroadCastBettingDisabled(sessId)
-
-    return jsonify({'Handled':True})
+        return jsonify({'Handled':True})
 
 @app.route('/Game/api/v1.0/AddPlayerFunds', methods=['GET','POST'])
 def AddPlayerFunds():
-    if not request.json:
-        abort(400)
-    sessId = request.json['sessionId']
-    sessKey = request.json['sessionKey']
-    userId = request.json['userId']
-    amount = request.json['amount']
+    if(_ValidRequest(request)):
+        sessId = request.json['sessionId']
+        userId = request.json['userId']
+        amount = request.json['amount']
 
-    # Check if it is active and correct key
-    if(not database.SessionActive(sessId) or not database.CorrectSessionKey(sessId, sessKey)):
-        raise ConnectionRefusedError("Inactive sessionId or invalid sessionKey")
-
-    UpdateUserStanding(sessId, row['UserId'], row['Odds']*row['Amount'])
-    return jsonify({'Handled':True})
+        UpdateUserStanding(sessId, row['UserId'], row['Odds']*row['Amount'])
+        return jsonify({'Handled':True})
 
 def SetBettingState(state, sessId):
     db = database.get_db()

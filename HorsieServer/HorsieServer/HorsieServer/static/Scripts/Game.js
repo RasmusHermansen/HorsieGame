@@ -27,6 +27,32 @@ function SetHorses(horses, socket) {
     });
 }
 
+function SetPlayers(players, socket) {
+    $("#people").empty()
+    players.forEach(function (player) {
+        $("#people").append(
+            `<li class="list-group-item-drink" id="li-${player.id}">
+            <span class="Player-Alias">${player.Alias}</span>
+            <button id="btn-drink-large-${player.id}" type="button" class="btn btn-secondary btn-drink pull-right">5 Beer</button>
+            <button id="btn-drink-medium-${player.id}" type="button" class="btn btn-secondary btn-drink pull-right">3 Shot</button>
+            <button id="btn-drink-small-${player.id}" type="button" class="btn btn-secondary btn-drink pull-right">1 Sip</button></li>`)
+        $(`#btn-drink-large-${player.id}`).click(function () {
+            GiveDrink(player.id, 5, socket)
+        });
+        $(`#btn-drink-medium-${player.id}`).click(function () {
+            GiveDrink(player.id, 3, socket)
+        });
+        $(`#btn-drink-small-${player.id}`).click(function () {
+            GiveDrink(player.id, 1, socket)
+        });
+    });
+    Sortable.create(document.getElementById('people'), {
+        animation: 100,
+        draggable: '.list-group-item-drink',
+        handle: '.list-group-item-drink'
+    });
+}
+
 function UpdateOdds(odds) {
     odds.forEach(function (oddAndHorse) {
         $(`#odds-${oddAndHorse.id}`).text(oddAndHorse.Odds)
@@ -35,6 +61,13 @@ function UpdateOdds(odds) {
 
 function SetSaldo(saldo) {
     $("#Standing").text(saldo);
+}
+
+function GiveDrink(player, drink, socket) {
+    socket.emit('GiveDrink', {
+        'player': player,
+        'drink':drink
+    })
 }
 
 function BetOnHorse(horse, amount, socket) {
@@ -58,6 +91,17 @@ function FormatTopThree(topThree) {
 }
 
 $(function () {
+    $("#ShowPeople").click(function () {
+        $("#horses").hide();
+        $("#people").show();
+    });
+    $("#ShowHorses").click(function () {
+        $("#people").hide();
+        $("#horses").show();
+    });
+})
+
+$(function () {
     // Get that socketIo
     var socket = io();
     socket.on('connect', function () {
@@ -74,6 +118,10 @@ $(function () {
 
     socket.on('HorsesChanged', function (data) {
         SetHorses(data, socket) // Slightly sketchy to pass socket?
+    })
+
+    socket.on('PlayersChanged', function (data) {
+        SetPlayers(data, socket) // Slightly sketchy to pass socket?
     })
 
     socket.on('SaldoChanged', function (saldo) {

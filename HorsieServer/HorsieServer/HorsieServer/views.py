@@ -79,13 +79,36 @@ def AcceptBet(data):
             ProvideSaldoInformation()
             socketio.send("Bet registered.")
         else:
-            socketio.send("Bet not registered: Not enough funds.")
+            socketio.send("Bet not registered: you are poor.")
     else:
-        socketio.send("Bety not registered: Betting currently disabled.");
+        socketio.send("Bet not registered: Betting currently disabled.");
 
 @socketio.on('GetSaldo')
 def GetSaldo():
     ProvideSaldoInformation();
+
+@socketio.on('GiveDrink')
+def GiveDrink(data):
+    toUserId = data['player']
+    drink = data['drink']
+    db = database.get_db()
+    id = db.cursor().execute('SELECT id FROM Users WHERE SessionId=? AND alias=?',[session['SessionId'],session['Alias']]).fetchone()[0]
+    # Check Standing
+    standing = GetUserStandingByID(session['SessionId'],id)
+    # Accept bet (!!! Set a timer for minimum time between bets? !!!)
+    if standing >= drink:
+        # Update standing
+        UpdateUserStanding(session['SessionId'], id, -drink,standing)
+        # Register drink
+        db = database.get_db()
+        db.execute('INSERT INTO Drinks (SessionId, FromUserId, ToUserId, Drink, Dealt) VALUES (?,?,?,?,?)', 
+	                    [session['SessionId'], id, toUserId,  drink, False])
+        db.commit()
+        # Update the users saldo information
+        ProvideSaldoInformation()
+        socketio.send("Sent Drink.")
+    else:
+        socketio.send("Drink not sent: you are poor.")
 
 @socketio.on('Join room')
 def AssignToRoom():
@@ -94,16 +117,20 @@ def AssignToRoom():
     emit("HorsesChanged",GetRelevantHorsesData(session['SessionId']))
     emit("OddsChanged",GetReleveantOddsData(session['SessionId']))
     ProvideSaldoInformation()
+    BroadPlayersChanged(session['SessionId'])
 
 def ProvideSaldoInformation():
     emit("SaldoChanged", str(GetUserStandingByAlias(session['SessionId'],session['Alias'])))
 
 def BroadCastOddsChanged(roomId):
-    socketio.emit("HorsesChanged",GetReleveantOddsData(roomId),room=str(roomId))
+    socketio.emit("OddsChanged",GetReleveantOddsData(roomId),room=str(roomId))
 
 def BroadCastHorsesChanged(roomId):
     socketio.emit("HorsesChanged",GetRelevantHorsesData(roomId),room=str(roomId))
     BroadCastOddsChanged(roomId)
+
+def BroadPlayersChanged(roomId):
+    socketio.emit("PlayersChanged",GetRelevantPlayersData(roomId),room=str(roomId))
 
 def BroadCastRaceOver(roomId, topthree):
     socketio.emit("RaceOver", topthree, roomId=str(roomId))
@@ -117,6 +144,10 @@ def GetRelevantHorsesData(roomId):
 
 def GetReleveantOddsData(roomId):
     return [dict(x) for x in database.get_db().cursor().execute('SELECT id, Odds FROM Horses WHERE SessionId=?',[roomId]).fetchall()]
+
+def GetRelevantPlayersData(roomId):
+    return [dict(x) for x in database.get_db().cursor().execute('SELECT id, Alias FROM Users WHERE SessionId=?',[roomId]).fetchall()]
+
 
 def GetUserStandingByAlias(sessionId, alias):
     return database.get_db().cursor().execute('SELECT Standing FROM Users WHERE SessionId=? AND Alias=?',[sessionId,alias]).fetchone()[0]

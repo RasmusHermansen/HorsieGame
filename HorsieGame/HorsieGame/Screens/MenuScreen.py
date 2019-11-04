@@ -15,6 +15,9 @@ class Ui_QtMainScreen(DynamicWidget):
     startNewSession = pyqtSignal();
     startNewGame = pyqtSignal();
     addAHorse = pyqtSignal();
+    refreshHorses = pyqtSignal();
+    removeAHorse = pyqtSignal();
+    clearADrink = pyqtSignal(int);
 
     def __init__(self):
         super().__init__("Main")
@@ -129,55 +132,125 @@ class Ui_QtMainScreen(DynamicWidget):
         # prep horse and players dict
         self.horses = {}
         self.players = {}
+        self.drinks = {}
 
-        # Animate assets onto screen
-        self.RaceLink = self.CreateLinkText("Race!", 32, self.startNewGame.emit)
-        self.RaceLink.setPos(self.Scene.width() + 30,4*self.Scene.height()/5); # Racelink
-        self.AnimationEngine.addAnimation(QtTrajectory.SlowingLinearPath(self.RaceLink,-self.Scene.width()/3,0,125))
+        self.outerColumns = self.Scene.width()/4
+
+        ### Left Column
+        # Horses label
+        self.HorsesLabel = self.CreateSimpleText("Horses", 24)
+        self.HorsesLabel.setPos(-50,2*self.Scene.height()/5); 
+        self.AnimationEngine.addAnimation(QtTrajectory.SlowingLinearPath(self.HorsesLabel,self.outerColumns,0,125))
+        # AddHorse
         self.AddHorsesLink = self.CreateLinkText("Add a horse", 16, self.addAHorse.emit)
-        self.AddHorsesLink.setPos(-50,4*self.Scene.height()/5); # AddHorses
-        self.AnimationEngine.addAnimation(QtTrajectory.SlowingLinearPath(self.AddHorsesLink,self.Scene.width()/3,0,125))
-        self.HorsesLabel = self.CreateSimpleText("Horses", 22)
-        self.HorsesLabel.setPos(-50,2*self.Scene.height()/5); # Horses
-        self.AnimationEngine.addAnimation(QtTrajectory.SlowingLinearPath(self.HorsesLabel,self.Scene.width()/3,0,125))
-        self.PlayersLabel = self.CreateSimpleText("Players", 22)
-        self.PlayersLabel.setPos(self.Scene.width()+50,2*self.Scene.height()/5); # Players
-        self.AnimationEngine.addAnimation(QtTrajectory.SlowingLinearPath(self.PlayersLabel,-self.Scene.width()/3,0,125))
+        self.AddHorsesLink.setPos(-50,4*self.Scene.height()/5); 
+        self.AnimationEngine.addAnimation(QtTrajectory.SlowingLinearPath(self.AddHorsesLink,self.outerColumns,0,125))
+        # RefreshHorses
+        self.RefreshHorsesLink = self.CreateLinkText("New Horses", 16, self.refreshHorses.emit)
+        self.RefreshHorsesLink.setPos(-50,4*self.Scene.height()/5+50); 
+        self.AnimationEngine.addAnimation(QtTrajectory.SlowingLinearPath(self.RefreshHorsesLink,self.outerColumns,0,125))
+        # RemoveHorse
+        self.RemoveHorsesLink = self.CreateLinkText("Remove a horse", 16, self.removeAHorse.emit)
+        self.RemoveHorsesLink.setPos(-50,4*self.Scene.height()/5+100); 
+        self.AnimationEngine.addAnimation(QtTrajectory.SlowingLinearPath(self.RemoveHorsesLink,self.outerColumns,0,125))
+
+        ### Center
+        # Gamename label
         self.gameNameLabel = self.CreateSimpleText("Session name:", 26)
-        self.gameNameLabel.setPos(self.Scene.width()/2,-75); # Gamename label
+        self.gameNameLabel.setPos(self.Scene.width()/2,-75); 
         self.AnimationEngine.addAnimation(QtTrajectory.SlowingLinearPath(self.gameNameLabel,0,self.Scene.height()/4,125))
+        # Gamename
         if hasattr(self,"CurrentGameName"):
             self.gameName = self.CreateSimpleText(self.CurrentGameName, 26)
         else:
             self.gameName = self.CreateSimpleText("<Err:UNKNOWN>", 26)
-        self.gameName.setPos(self.Scene.width()/2,-10); # Gamename
+        self.gameName.setPos(self.Scene.width()/2,-10); 
         self.AnimationEngine.addAnimation(QtTrajectory.SlowingLinearPath(self.gameName,0,self.Scene.height()/4,125))
+        # Bets
+        self.gameNameLabel = self.CreateSimpleText("Paid drinks:", 24)
+        self.gameNameLabel.setPos(self.Scene.width()/2,self.Scene.height() + 75); 
+        self.AnimationEngine.addAnimation(QtTrajectory.SlowingLinearPath(self.gameNameLabel,0, -3*self.Scene.height()/5-75,125))
+
+        ## Right Column
+        # Racelink
+        self.RaceLink = self.CreateLinkText("Race!", 32, self.startNewGame.emit)
+        self.RaceLink.setPos(self.Scene.width() + 30,4*self.Scene.height()/5 + 50);
+        self.AnimationEngine.addAnimation(QtTrajectory.SlowingLinearPath(self.RaceLink,-self.outerColumns,0,125))
+        # Players
+        self.PlayersLabel = self.CreateSimpleText("Players", 24)
+        self.PlayersLabel.setPos(self.Scene.width()+50,2*self.Scene.height()/5); # Players
+        self.AnimationEngine.addAnimation(QtTrajectory.SlowingLinearPath(self.PlayersLabel,-self.outerColumns,0,125))
+
+
+
+
+    def _GetPlayerAlias(self, id):
+        for k, v in self.players.items():
+            if (v.id == id):
+                return k
+        return "<Unknown>"
 
     def _DisplayHorses(self, horses):
-        # TODO: Remove horses no longer in keys
+        for k, v in self.horses.items():
+            self.Scene.removeItem(v)
+            
+        self.horses = {}
+
         for horse in horses:
             if not horse in self.horses.keys():
                 horseLabel = self.CreateSimpleText(horse, 18)
-                horseLabel.setPos(self.Scene.width()/3, 2*self.Scene.height()/5+45*(len(self.horses)+1))
+                horseLabel.setPos(self.outerColumns, 2*self.Scene.height()/5+45*(len(self.horses)+1))
                 self.horses[horse] = horseLabel
 
     def SetHorses(self, horses, header):
         nameIdx = header.index("Name")
         self._DisplayHorses([horse[nameIdx] for horse in horses])
 
+    def ClearPlayers(self):
+        for k, v in self.players.items():
+            self.Scene.removeItem(v)
+        self.players = {}
+
     def _DisplayPlayers(self, players):
-        # TODO: Remove Players no longer in keys
-        for player, standing in players:
+        self.ClearPlayers()
+
+        # TODO: Click to kick
+        for player, standing, id in players:
             if not player in self.players.keys():
+                # Create Label
                 playerLabel = self.CreateSimpleText("{0} ({1})".format(player,standing), 18)
-                playerLabel.setPos(2*self.Scene.width()/3, 2*self.Scene.height()/5+45*(len(self.players)+1))
+                playerLabel.id = id
+                playerLabel.setPos(self.Scene.width() - self.outerColumns, 2*self.Scene.height()/5+45*(len(self.players)+1))
                 self.players[player] = playerLabel
 
     def SetPlayers(self, players, header):
         nameIdx = header.index("Alias")
         standingIdx = header.index("Standing")
-        self._DisplayPlayers([(player[nameIdx], player[standingIdx]) for player in players])
+        idIdx = header.index("id")
+        self._DisplayPlayers([(player[nameIdx], player[standingIdx], player[idIdx]) for player in players])
+
+    def ClearDrinks(self):
+        for k, v in self.drinks.items():
+            self.Scene.removeItem(v)
+        self.drinks = {}
+
+    def _DisplayDrinks(self, drinks):
+        self.ClearDrinks()
+        
+        for fromUserId, toUserId, drink, id in drinks:
+            fromUser = self._GetPlayerAlias(fromUserId)
+            toUser = self._GetPlayerAlias(toUserId)
+            DrinkLabel = self.CreateLinkText("{0}->{1} ({2})".format(fromUser, toUser, drink), 18, lambda: self.clearADrink.emit(id))
+            DrinkLabel.setPos(self.Scene.width()/2, 2*self.Scene.height()/5+45*(len(self.drinks)+1))
+            self.drinks[id] = DrinkLabel
     
+    def SetDrinks(self, drinks, header, dealtDrinkFunc):
+        fromUserIdx = header.index("FromUserId");
+        toUserIdx = header.index("ToUserId");
+        drinkIdx = header.index("Drink")
+        idIdx = header.index("id")
+        self._DisplayDrinks([(drink[fromUserIdx], drink[toUserIdx], drink[drinkIdx], drink[idIdx]) for drink in drinks])
+
     def SetGameName(self, name):
         self.CurrentGameName = name
         if hasattr(self,'gameName'):

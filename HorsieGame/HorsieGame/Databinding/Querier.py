@@ -23,6 +23,15 @@ class Querier():
         r = self.conn.PostRequest("GetAllPlayers", {'sessionId':self._sessId,'sessionKey':self._sessKey})
         return r.json()
 
+    def GetDrinks(self):
+        assert self.IsInstantiated(), "Query attempted without an instantiated session"
+        r = self.conn.PostRequest("GetDrinks", {'sessionId':self._sessId,'sessionKey':self._sessKey})
+        return r.json()
+
+    def DealDrink(self, drinkId):
+        assert self.IsInstantiated(), "Query attempted without an instantiated session"
+        r = self.conn.PostRequest("DrinksDealt", {'sessionId':self._sessId,'sessionKey':self._sessKey, 'drinkId':drinkId})
+
     def SetHorseCount(self,count):
         assert self.IsInstantiated(), "Query attempted without an instantiated session"
         r = self.conn.PostRequest("SetHorses", {'sessionId':self._sessId,'sessionKey':self._sessKey,'horsesCount':count})

@@ -16,14 +16,17 @@ class QtHorse(Horse):
         # Create Horse Object
         self.Obj = QtDynLenSprite()
         # Make label background transparent
-        horseData = self._GetHorseAsset();
+        horseData = self._GetHorseAsset(name);
         self.Obj.setSpriteAsset(horseData[0],horseData[1],horseData[2])
         self.Obj.setSpriteSpeed(2)
         # Add to scene
         Scene.addItem(self.Obj)
 
-    def _GetHorseAsset(self):
-        return random.choice([
-            ["Assets/Horses/Basic.png",251,180],
-            ["Assets/Horses/White_Sprite.png",256,176]
-            ])
+    def _GetHorseAsset(self, horseName):
+        horses = {
+            "Basic": ["Assets/Horses/Basic.png",303,222],
+            "HeztBollah": ["Assets/Horses/Basic.png",303,222],
+            "LeninHest": ["Assets/Horses/Basic.png",303,222],
+            "XenoHorse": ["Assets/Horses/Basic.png",303,222]
+        }
+        return horses[horseName]
