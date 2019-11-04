@@ -26,7 +26,7 @@ class QtHorse(Horse):
         horses = {
             "Basic": ["Assets/Horses/Basic.png",303,222],
             "HeztBollah": ["Assets/Horses/Basic.png",303,222],
-            "LeninHest": ["Assets/Horses/Basic.png",303,222],
+            "HimlerHorse": ["Assets/Horses/HimlerHorse.png",307,227],
             "XenoHorse": ["Assets/Horses/Basic.png",303,222]
         }
         return horses[horseName]

@@ -190,11 +190,15 @@ class Ui_QtMainScreen(DynamicWidget):
                 return k
         return "<Unknown>"
 
-    def _DisplayHorses(self, horses):
-        for k, v in self.horses.items():
-            self.Scene.removeItem(v)
+    def ClearHorses(self):
+        if hasattr(self,"horses") and self.horses:
+            for k, v in self.horses.items():
+                self.Scene.removeItem(v)
             
         self.horses = {}
+
+    def _DisplayHorses(self, horses):
+        #self.ClearHorses()
 
         for horse in horses:
             if not horse in self.horses.keys():
@@ -207,12 +211,13 @@ class Ui_QtMainScreen(DynamicWidget):
         self._DisplayHorses([horse[nameIdx] for horse in horses])
 
     def ClearPlayers(self):
-        for k, v in self.players.items():
-            self.Scene.removeItem(v)
+        if hasattr(self,"players") and self.players:
+            for k, v in self.players.items():
+                self.Scene.removeItem(v)
         self.players = {}
 
     def _DisplayPlayers(self, players):
-        self.ClearPlayers()
+        #self.ClearPlayers()
 
         # TODO: Click to kick
         for player, standing, id in players:
@@ -230,19 +235,21 @@ class Ui_QtMainScreen(DynamicWidget):
         self._DisplayPlayers([(player[nameIdx], player[standingIdx], player[idIdx]) for player in players])
 
     def ClearDrinks(self):
-        for k, v in self.drinks.items():
-            self.Scene.removeItem(v)
+        if hasattr(self,"drinks") and self.drinks:
+            for k, v in self.drinks.items():
+                self.Scene.removeItem(v)
         self.drinks = {}
 
     def _DisplayDrinks(self, drinks):
-        self.ClearDrinks()
+        #self.ClearDrinks()
         
         for fromUserId, toUserId, drink, id in drinks:
-            fromUser = self._GetPlayerAlias(fromUserId)
-            toUser = self._GetPlayerAlias(toUserId)
-            DrinkLabel = self.CreateLinkText("{0}->{1} ({2})".format(fromUser, toUser, drink), 18, lambda: self.clearADrink.emit(id))
-            DrinkLabel.setPos(self.Scene.width()/2, 2*self.Scene.height()/5+45*(len(self.drinks)+1))
-            self.drinks[id] = DrinkLabel
+            if not id in self.drinks.keys():
+                fromUser = self._GetPlayerAlias(fromUserId)
+                toUser = self._GetPlayerAlias(toUserId)
+                DrinkLabel = self.CreateLinkText("{0}->{1} ({2})".format(fromUser, toUser, drink), 18, lambda: self.clearADrink.emit(id))
+                DrinkLabel.setPos(self.Scene.width()/2, 2*self.Scene.height()/5+45*(len(self.drinks)+1))
+                self.drinks[id] = DrinkLabel
     
     def SetDrinks(self, drinks, header, dealtDrinkFunc):
         fromUserIdx = header.index("FromUserId");
