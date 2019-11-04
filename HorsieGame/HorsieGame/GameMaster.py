@@ -48,7 +48,6 @@ class GameMaster(QMainWindow):
         self._inPerformUpdateFuncs = False
 
 #region WELCOMESCREEN And MENUSCREEN
-
     def SetToWelcome(self):
         self.MenuWidget = MenuScreen.Ui_QtMainScreen();
         self.MenuWidget.SetMode(MenuScreen.widgetMode.WelcomeScreen)
@@ -71,7 +70,7 @@ class GameMaster(QMainWindow):
             self.LoadingWidget.ChangeStatus("Setting up session")
             # Add two horses
             if(not hasattr(self,"Horses")):
-                self.AddOrRemoveHorses(2)
+                self.AddOrRemoveHorses(4)
         except Exception as e: 
             print(e)
             self.SetToWelcome()
@@ -95,14 +94,25 @@ class GameMaster(QMainWindow):
             return
         else:
             self.app.processEvents()
-            self.Horses = self.conn.SetHorseCount(count)['Horses']
-            self.PopulateHorseTable()
+            self.worker = RunThread(lambda: self.conn.SetHorseCount(count)['Horses'], self._AddOrRemoveHorsesCB)
+
+    def _AddOrRemoveHorsesCB(self, horses):
+        self.Horses = horses
+        self.PopulateHorseTable()
+
+    def RefreshHorses(self):
+        count = len(self.Horses)
+        self.AddOrRemoveHorses(0)
+        self.AddOrRemoveHorses(count)
 
     def AddOneHorse(self):
         self.AddOrRemoveHorses(len(self.Horses)+1)
+
+    def RemoveOneHorse(self):
+        self.AddOrRemoveHorses(min(len(self.Horses)-1,1))
     
     def PopulateHorseTable(self):
-        if self.Horses: # <-- True if not empty
+        if self.Horses:
             header = list(self.Horses[0].keys())
             data = [list(x.values()) for x in self.Horses]
             self.MenuWidget.SetHorses(data, header)
@@ -133,15 +143,15 @@ class GameMaster(QMainWindow):
 #endregion 
 
 #region GameScreen
-
     def StartGame(self):
         # Set loading widget
         #self.SetToLoading()
         #self.LoadingWidget.ChangeStatus("Feeding Horses (Doing Nothing)")
-        self.GameWidget = GameScreen.Ui_QtGameScreen(self.PostGame, self.Horses)
+        self.GameWidget = GameScreen.Ui_QtGameScreen(self.PostGame, self.Horses, self.DisableBetting)
         self.setCentralWidget(self.GameWidget.getWidget())
         self.app.processEvents()
         AudioPlayer().SetBackgroundTrack('LoneRanger');
+        # TODO: Remove "GetPlayers.." from UpdateFuncs (add in post game)
         self.GameWidget.RunGame()
         
     def PostGame(self, results):
@@ -149,16 +159,17 @@ class GameMaster(QMainWindow):
         self.SetToMenu()
 
     def ReportResults(self, results):
-        self.conn.ReportResults([results[place].Name for place in sorted(results)])
+        self.conn.ReportResults([results[place].Id for place in sorted(results)])
 
+    def DisableBetting(self):
+        self.worker = RunThread(self.conn.DisableBetting)
 #endregion
-#region Loading screen
 
+#region Loading screen
     def SetToLoading(self):
         AudioPlayer().PlayEffect("Vrinsk")
         self.LoadingWidget = LoadingScreen.Ui_QtLoadingScreen()
         self.setCentralWidget(self.LoadingWidget.getWidget())
-
 #endregion
 
     def __InitMainWindow(self):
@@ -198,12 +209,13 @@ class RunThread(QThread):
     """
     finished = pyqtSignal([object])
 
-    def __init__(self, func, on_finish, *args, **kwargs):
+    def __init__(self, func, on_finish = None, *args, **kwargs):
         super(RunThread, self).__init__()
         self.args = args
         self.kwargs = kwargs
         self.func = func
-        self.finished.connect(on_finish)
+        if on_finish:
+            self.finished.connect(on_finish)
         self.start()
 
     def run(self):
@@ -213,4 +225,5 @@ class RunThread(QThread):
             print(e)
             result = e
         finally:
-            self.finished.emit(result)
+            if self.finished:
+                self.finished.emit(result)

@@ -1,5 +1,5 @@
 from HorsieServer.Setup import app, request, abort, socketio
-from HorsieServer.views import BroadCastHorsesChanged
+from HorsieServer.views import BroadCastHorsesChanged, UpdateUserStanding, BroadCastRaceOver, BroadCastBettingDisabled
 from HorsieServer.HorseClasses import HorseClasses
 import HorsieServer.db as database
 import datetime, random, string
@@ -36,7 +36,7 @@ def CreateSession():
 
     # Create Session
     db = database.get_db()
-    db.execute('INSERT INTO Sessions (SessionName, SessionKey, IsActive, Created) VALUES (?,?,1,?)', 
+    db.execute('INSERT INTO Sessions (SessionName, SessionKey, IsActive, BettingEnabled, Created) VALUES (?,?,1,1,?)', 
 	                    [sessionName,sessionKey,datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")])
     db.commit()
     # Get new sessionId
@@ -63,12 +63,12 @@ def CloseSession():
     return jsonify({'Closed': True})
 
 def GenerateHorseKnots():
-    Knot1 = random.normalvariate(8,1.5)
+    Knot1 = random.normalvariate(9,1.5)
     Knot2 = random.normalvariate(8,1.5)
-    Knot3 = random.normalvariate(8,1.5)
+    Knot3 = random.normalvariate(7,1.5)
     Knot4 = random.normalvariate(8,1.5)
-    Knot5 = random.normalvariate(9,1.5)
-    Knot6 = random.normalvariate(13,4)
+    Knot5 = random.normalvariate(10,1.5)
+    Knot6 = random.normalvariate(14,4)
     return [Knot1, Knot2, Knot3, Knot4, Knot5, Knot6]
 
 def GetHorseClass(currentClasses):
@@ -103,13 +103,13 @@ def SetHorses():
             for i in range(0,desiredHorses - numberHorses):
                 horseClass = GetHorseClass(currentHorses)
                 db.execute('INSERT INTO Horses (SessionId, Name, HorseClass, Knot1, Knot2, Knot3, Knot4, Knot5, Knot6, ProbAction1, ProbAction2, Odds) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)', 
-	                            [request.json['sessionId'], horseClass, horseClass] + GenerateHorseKnots() + ["0","0","0"])
+	                            [request.json['sessionId'], horseClass, horseClass] + GenerateHorseKnots() + ["0","0","5"])
                 db.commit()
                 currentHorses.append(horseClass)
             changed = True
 
         # Get horses
-        tbl_Horses = db.cursor().execute('SELECT Name, HorseClass, Knot1, Knot2, Knot3, Knot4, Knot5, Knot6, ProbAction1, ProbAction2 FROM Horses Where SessionId=?',[request.json['sessionId']]).fetchall()
+        tbl_Horses = db.cursor().execute('SELECT id, Name, HorseClass, Knot1, Knot2, Knot3, Knot4, Knot5, Knot6, ProbAction1, ProbAction2 FROM Horses Where SessionId=?',[request.json['sessionId']]).fetchall()
 
         if changed:
             BroadCastHorsesChanged(request.json['sessionId'])
@@ -126,20 +126,84 @@ def GetAllPlayers():
         
         return jsonify({'Players':[dict(x) for x in tbl_Players]})
 
-@app.route('/Game/api/v1.0/GetAllBets', methods=['GET','POST'])
+@app.route('/Game/api/v1.0/GetActiveBets', methods=['GET','POST'])
 def GetAllBets():
     raise NotImplementedError()
     if not request.json:
         abort(400)
     sessId = request.json['sessionId']
     sessKey = request.json['sessionKey']
-    sessRun = request.json['sessionRun']
     # Check if it is active and correct key
     if(not database.SessionActive(sessId) or not database.CorrectSessionKey(sessId, sessKey)):
         raise ConnectionRefusedError("Inactive sessionId or invalid sessionKey")
     # Make query
-    db = database.get_db()
-    bets = db.cursor().execute('SELECT ActionId FROM Actions WHERE SessionId=?',[session['SessionId']]).fetchall()
 
     return jsonify({'Closed': True})
 
+@app.route('/Game/api/v1.0/ReportResults', methods=['GET','POST'])
+def ReportResults():
+    if not request.json:
+        abort(400)
+    sessId = request.json['sessionId']
+    sessKey = request.json['sessionKey']
+    # Check if it is active and correct key
+    if(not database.SessionActive(sessId) or not database.CorrectSessionKey(sessId, sessKey)):
+        raise ConnectionRefusedError("Inactive sessionId or invalid sessionKey")
+    
+    db = database.get_db()
+    # Get unhandled all bets
+    bets = db.cursor().execute('SELECT UserId, HorseId, Odds, Amount FROM Bets WHERE SessionId=? AND Handled=?',[sessId,False]).fetchall()
+    
+    # Make all unhandled bets handled
+    db.execute('UPDATE Bets SET Handled=? WHERE SessionId=?', [True,sessId])
+    db.commit()
+
+    # Reward winners (Should aggregate)
+    for row in bets:
+        if row['HorseId'] == request.json['results'][0]:
+            UpdateUserStanding(sessId, row['UserId'], row['Odds']*row['Amount'])
+
+    BroadCastRaceOver(sessId, request.json['results'][:3])
+
+    # Re-enable betting
+    SetBettingState(True, sessId)
+
+    return jsonify({'Handled':True})
+
+@app.route('/Game/api/v1.0/DisableBetting', methods=['GET','POST'])
+def DisableBetting():
+    if not request.json:
+        abort(400)
+    sessId = request.json['sessionId']
+    sessKey = request.json['sessionKey']
+
+    # Check if it is active and correct key
+    if(not database.SessionActive(sessId) or not database.CorrectSessionKey(sessId, sessKey)):
+        raise ConnectionRefusedError("Inactive sessionId or invalid sessionKey")
+
+    SetBettingState(False, sessId)
+
+    BroadCastBettingDisabled(sessId)
+
+    return jsonify({'Handled':True})
+
+@app.route('/Game/api/v1.0/AddPlayerFunds', methods=['GET','POST'])
+def AddPlayerFunds():
+    if not request.json:
+        abort(400)
+    sessId = request.json['sessionId']
+    sessKey = request.json['sessionKey']
+    userId = request.json['userId']
+    amount = request.json['amount']
+
+    # Check if it is active and correct key
+    if(not database.SessionActive(sessId) or not database.CorrectSessionKey(sessId, sessKey)):
+        raise ConnectionRefusedError("Inactive sessionId or invalid sessionKey")
+
+    UpdateUserStanding(sessId, row['UserId'], row['Odds']*row['Amount'])
+    return jsonify({'Handled':True})
+
+def SetBettingState(state, sessId):
+    db = database.get_db()
+    db.execute('UPDATE Sessions SET BettingEnabled=? WHERE id=?',[state,sessId])
+    db.commit()

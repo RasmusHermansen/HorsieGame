@@ -34,4 +34,8 @@ class Querier():
 
     def ReportResults(self, results):
         assert self.IsInstantiated(), "Query attempted without an instantiated session"
-        self.conn.PostRequest("ReportResult", {'sessionId':self._sessId,'sessionKey':self._sessKey,'results':results})
+        self.conn.PostRequest("ReportResults", {'sessionId':self._sessId,'sessionKey':self._sessKey,'results':results})
+
+    def DisableBetting(self):
+        assert self.IsInstantiated(), "Query attempted without an instantiated session"
+        self.conn.PostRequest("DisableBetting", {'sessionId':self._sessId,'sessionKey':self._sessKey})

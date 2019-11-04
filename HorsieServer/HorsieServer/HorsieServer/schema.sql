@@ -4,6 +4,7 @@ create table Sessions (
   SessionName TEXT not null,
   SessionKey TEXT not null,
   IsActive INTEGER not null,
+  BettingEnabled BOOLEAN not null,
   Created TEXT  not null,
   Closed TEXT 
 );

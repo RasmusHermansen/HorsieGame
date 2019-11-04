@@ -4,13 +4,14 @@ import random
 
 class Horse(object):
 
-    def __init__(self,name, KnotPoints, KnotValues):
+    def __init__(self,name, id, KnotPoints, KnotValues):
         # Den fucking hest
         self.KnotPoints = KnotPoints
         self.KnotValues = [knot + random.normalvariate(0,2) for knot in KnotValues]
         self.MaxT = max(KnotPoints)
         self.MaxTSpeed = KnotValues[len(KnotValues)-1]
         self.t = 0
+        self.Id = id
         self.Name = name
         self.tck = interpolate.splrep(KnotPoints,KnotValues,s=0) 
 

@@ -6,9 +6,9 @@ import random
 
 class QtHorse(Horse):
         
-    def __init__(self, name, KnotPoints, KnotValues, Scene):
+    def __init__(self, name, id, KnotPoints, KnotValues, Scene):
         # Instantiate BaseHorse
-        super().__init__(name, KnotPoints, KnotValues)
+        super().__init__(name, id, KnotPoints, KnotValues)
 
         self.Finished = False
         self.FinishT = 9999
@@ -18,7 +18,7 @@ class QtHorse(Horse):
         # Make label background transparent
         horseData = self._GetHorseAsset();
         self.Obj.setSpriteAsset(horseData[0],horseData[1],horseData[2])
-        self.Obj.setSpriteSpeed(1)
+        self.Obj.setSpriteSpeed(2)
         # Add to scene
         Scene.addItem(self.Obj)
 

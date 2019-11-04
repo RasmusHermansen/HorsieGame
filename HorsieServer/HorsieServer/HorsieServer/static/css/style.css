@@ -15,7 +15,7 @@ time, mark, audio, video, button, input {
     margin: 0;
     padding: 0;
     border: 0;
-    font-size: 100%;
+    font-size: xx-large;
     font-family: SouthPark;
     vertical-align: baseline;
 }
@@ -149,9 +149,9 @@ body {
 }
 
 .btn-bet {
-    height:3em;
-    width:3em;
-    margin-left:0.5em;
+    height:4em;
+    width:4em;
+    margin-left:0.75em;
 }
 
 .btn-bet:active {
@@ -165,17 +165,17 @@ body {
 }
 
 .list-group-item {
-    margin-bottom: 0.05em;
+    margin-bottom: 0.20em;
     border-color: black;
     border-width: 2px;
     display: block;
-    height:4.5em;
+    height:5.5em;
 }
 
 .horse-icon {
     border-radius:50%;
-    height:3em;
-    width:3em;
+    height:4em;
+    width:4em;
 }
 
 .headerBar {
@@ -184,7 +184,7 @@ body {
     padding-top: 0.5rem;
     padding-left:1em;
     padding-right:1em;
-    margin-bottom: 0.25em;
+    margin-bottom: 0.5em;
     display: block;
 }
 
@@ -203,4 +203,28 @@ body {
 
 .odds {
     margin-left:3em;
+}
+
+.footerBar {
+    font-size:50%;
+    color:grey;
+    margin-top:1em;
+}
+
+.FirstPlace {
+    border: medium solid #d4af37;
+}
+
+.SecondPlace {
+    border: medium solid #c0c0c0;
+}
+
+.ThirdPlace {
+    border: medium solid #cd7f32;
+}
+
+@media (max-width: 1000px) {
+    .container {
+        width: 100%;
+    }
 }

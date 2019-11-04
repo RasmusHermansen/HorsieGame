@@ -19,14 +19,15 @@ def login():
             sessionId = request.form['SessionId'].upper()
             # Check existence and activity of session
             sessId = database.ActiveSessionIdFromSessionName(sessionId)
+            alias = request.form['Alias'].upper()
             if(sessId == -1):
                 error="No live sessions with that id"
             # Check if Alias already active in session or same sessionKey
-            elif(not database.AllowUserToEnterActiveSession(sessId, request.form['Alias'], session['UserKey'] if 'UserKey' in session else "")):
+            elif(not database.AllowUserToEnterActiveSession(sessId, alias, session['UserKey'] if 'UserKey' in session else "")):
                 error="A user already has that Alias(Username) in that Session"
             # Enter session
             else:
-                session['Alias'] = request.form['Alias']
+                session['Alias'] = alias
                 session['SessionId'] = sessId
                 session['UserKey'] = "".join(random.choices(string.ascii_letters + string.digits,k=16))
                 db = database.get_db()
@@ -58,23 +59,33 @@ def AcceptBet(data):
     db = database.get_db()
     # Check Odds
     odds = db.cursor().execute('SELECT Odds FROM Horses WHERE SessionId=? AND id=?',[session['SessionId'],horseId]).fetchone()[0]
-    # Get user id
-    id = db.cursor().execute('SELECT id FROM Users WHERE SessionId=? AND alias=?',[session['SessionId'],session['Alias']]).fetchone()[0]
-    # Check Standing
-    standing = GetUserStanding(session['SessionId'],id)
-    # Accept bet (!!! Set a timer for minimum time between bets? !!!)
-    if standing > amount:
-        # Update standing
-        UpdateUserStanding(session['SessionId'], id, -amount,standing)
-        # Register bet
-        db = database.get_db()
-        db.execute('INSERT INTO Bets (SessionId, UserId, HorseId, Odds, Amount, Handled) VALUES (?,?,?,?,?,?)', 
-	                    [session['SessionId'], id, horseId,  odds, amount, False])
-        db.commit()
-        # Update the users saldo information
-        ProvideSaldoInformation()
-    pass
+    # Check if betting is enabled
+    bettingEnabled = db.cursor().execute('SELECT BettingEnabled FROM Sessions WHERE id=?',[session['SessionId']]).fetchone()[0]
+    if (bettingEnabled):
+        # Get user id
+        id = db.cursor().execute('SELECT id FROM Users WHERE SessionId=? AND alias=?',[session['SessionId'],session['Alias']]).fetchone()[0]
+        # Check Standing
+        standing = GetUserStandingByID(session['SessionId'],id)
+        # Accept bet (!!! Set a timer for minimum time between bets? !!!)
+        if standing >= amount:
+            # Update standing
+            UpdateUserStanding(session['SessionId'], id, -amount,standing)
+            # Register bet
+            db = database.get_db()
+            db.execute('INSERT INTO Bets (SessionId, UserId, HorseId, Odds, Amount, Handled) VALUES (?,?,?,?,?,?)', 
+	                        [session['SessionId'], id, horseId,  odds, amount, False])
+            db.commit()
+            # Update the users saldo information
+            ProvideSaldoInformation()
+            socketio.send("Bet registered.")
+        else:
+            socketio.send("Bet not registered: Not enough funds.")
+    else:
+        socketio.send("Bety not registered: Betting currently disabled.");
 
+@socketio.on('GetSaldo')
+def GetSaldo():
+    ProvideSaldoInformation();
 
 @socketio.on('Join room')
 def AssignToRoom():
@@ -94,6 +105,12 @@ def BroadCastHorsesChanged(roomId):
     socketio.emit("HorsesChanged",GetRelevantHorsesData(roomId),room=str(roomId))
     BroadCastOddsChanged(roomId)
 
+def BroadCastRaceOver(roomId, topthree):
+    socketio.emit("RaceOver", topthree, roomId=str(roomId))
+
+def BroadCastBettingDisabled(roomId):
+    socketio.emit('BettingDisabled', roomId=str(roomId))
+
 # Move below functions into DB ?
 def GetRelevantHorsesData(roomId):
     return [dict(x) for x in database.get_db().cursor().execute('SELECT id, Name FROM Horses WHERE SessionId=?',[roomId]).fetchall()]
@@ -104,12 +121,12 @@ def GetReleveantOddsData(roomId):
 def GetUserStandingByAlias(sessionId, alias):
     return database.get_db().cursor().execute('SELECT Standing FROM Users WHERE SessionId=? AND Alias=?',[sessionId,alias]).fetchone()[0]
 
-def GetUserStanding(sessionId, id):
+def GetUserStandingByID(sessionId, id):
     return database.get_db().cursor().execute('SELECT Standing FROM Users WHERE SessionId=? AND id=?',[sessionId,id]).fetchone()[0]
 
 def UpdateUserStanding(sessionId, id, change, current = None):
     db = database.get_db()
     if not current:
-        current = GetUserStandingWithID(sessionId, id)
+        current = GetUserStandingByID(sessionId, id)
     db.cursor().execute("UPDATE Users SET Standing = ? WHERE SessionId=? AND id=?",[current + change,sessionId,id])
     db.commit()

@@ -9,7 +9,7 @@ import random
 
 class Ui_QtGameScreen(DynamicWidget):
 
-    def __init__(self, postGameCB, horses):
+    def __init__(self, postGameCB, horses, onFinishLineActive):
         super().__init__("Game")
 
         self.UpdateSpeed = 5; 
@@ -17,6 +17,7 @@ class Ui_QtGameScreen(DynamicWidget):
         self._constructBackground()
         self._constructHorses(horses)
         self._postGameCB = postGameCB
+        self._onFinishLineActive = onFinishLineActive
         self.FinishLineActive = False
 
     def _constructHorses(self, horses):
@@ -28,7 +29,7 @@ class Ui_QtGameScreen(DynamicWidget):
 
         for i, horsie in enumerate(horses):
             knotvalues = [horsie['Knot1'],horsie['Knot2'],horsie['Knot3'],horsie['Knot4'],horsie['Knot5'],horsie['Knot1']]
-            horse = QtHorse(horsie['Name'],knotPoints,knotvalues, self.Scene)
+            horse = QtHorse(horsie['Name'], horsie['id'],knotPoints,knotvalues, self.Scene)
             self.HorseEntities.append(horse)
             horse.Obj.setPos(0, round(0.6*self.Scene.height()) + i*25)
 
@@ -165,6 +166,7 @@ class Ui_QtGameScreen(DynamicWidget):
                     redColor = QColor(225,0,0)
                     self.FinishLineWidget = self.Scene.addRect(self.Scene.width(),round(0.6*self.Scene.height()),3,round(0.4*self.Scene.height()),pen,redColor)
                     self.FinishLineActive = True
+                    self._onFinishLineActive()
                     self.HorsesFinished = {}
                     # Start Capture Finish line
                     self.FinishLinePhotos = []
