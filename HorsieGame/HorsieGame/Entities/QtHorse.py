@@ -25,8 +25,11 @@ class QtHorse(Horse):
     def _GetHorseAsset(self, horseName):
         horses = {
             "Basic": ["Assets/Horses/Basic.png",303,222],
-            "HeztBollah": ["Assets/Horses/Basic.png",303,222],
+            "Horse Team Six": ["Assets/Horses/Horse Team Six.png",310,230],
             "HimlerHorse": ["Assets/Horses/HimlerHorse.png",307,227],
-            "XenoHorse": ["Assets/Horses/Basic.png",303,222]
+            "Ленин лошадь": ["Assets/Horses/LeninHorse.png",304,250],
+            "Klov Klux Klan": ["Assets/Horses/Klov Klux Klan.png",300,265],
+            "XenoHorse": ["Assets/Horses/XenoHorse.png",336,177],
+            "Donald Trav": ["Assets/Horses/Donald Trav.png",304,244]
         }
         return horses[horseName]

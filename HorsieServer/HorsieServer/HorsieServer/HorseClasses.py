@@ -1,11 +1,17 @@
 
 HorseClasses = [
- 	{"Name":"XenoHorse",
-	 "Icon":"XenoHorse.ico"},
-	{"Name":"HeztBollah",
-	 "Icon":"HeztBollah.ico"},
+ 	{"Name":"Horse Team Six",
+	 "Icon":"Horse Team Six.png"},
 	{"Name":"HimlerHorse",
-	 "Icon":"HimlerHorse.ico"},
+	 "Icon":"HimlerHorse.png"},
+	{"Name":"Ленин лошадь",
+	 "Icon":"LeninHorse.png"},
+	{"Name":"Donald Trav",
+	 "Icon":"Donald Trav.png"},
+	{"Name":"Klov Klux Klan",
+	 "Icon":"Klov Klux Klan.png"},
+	{"Name":"XenoHorse",
+	 "Icon":"XenoHorse.png"},
  	{"Name":"Basic",
-	 "Icon":"Basic.ico"}
+	 "Icon":"Basic.png"}
 ]

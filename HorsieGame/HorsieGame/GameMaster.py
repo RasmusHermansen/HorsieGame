@@ -70,7 +70,7 @@ class GameMaster(QMainWindow):
             self.LoadingWidget.ChangeStatus("Setting up session")
             # Add two horses
             if(not hasattr(self,"Horses")):
-                self.AddOrRemoveHorses(4)
+                self.AddOrRemoveHorses(8)
         except Exception as e: 
             print(e)
             self.SetToWelcome()

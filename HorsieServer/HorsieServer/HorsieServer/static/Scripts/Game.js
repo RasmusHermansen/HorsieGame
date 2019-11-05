@@ -5,7 +5,7 @@ function SetHorses(horses, socket) {
     horses.forEach(function (horse) {
         $("#horses").append(
             `<li class="list-group-item" id="li-${horse.id}">
-            <img class="horse-icon" src="https://hotemoji.com/images/emoji/l/7tzudlpkm9sl.png">
+            <img class="horse-icon" src="static/Icons/${horse.icon}">
             <div class="horse-details">
                 <span>${horse.Name}</span>
                 <br>
@@ -55,7 +55,7 @@ function SetPlayers(players, socket) {
 
 function UpdateOdds(odds) {
     odds.forEach(function (oddAndHorse) {
-        $(`#odds-${oddAndHorse.id}`).text(oddAndHorse.Odds)
+        $(`#odds-${oddAndHorse.id}`).text(Math.round(oddAndHorse.Odds*100)/100)
     });
 }
 

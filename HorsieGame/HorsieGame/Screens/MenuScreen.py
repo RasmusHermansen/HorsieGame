@@ -139,7 +139,7 @@ class Ui_QtMainScreen(DynamicWidget):
         ### Left Column
         # Horses label
         self.HorsesLabel = self.CreateSimpleText("Horses", 24)
-        self.HorsesLabel.setPos(-50,2*self.Scene.height()/5); 
+        self.HorsesLabel.setPos(-50,self.Scene.height()/5); 
         self.AnimationEngine.addAnimation(QtTrajectory.SlowingLinearPath(self.HorsesLabel,self.outerColumns,0,125))
         # AddHorse
         self.AddHorsesLink = self.CreateLinkText("Add a horse", 16, self.addAHorse.emit)
@@ -167,7 +167,7 @@ class Ui_QtMainScreen(DynamicWidget):
         self.gameName.setPos(self.Scene.width()/2,-10); 
         self.AnimationEngine.addAnimation(QtTrajectory.SlowingLinearPath(self.gameName,0,self.Scene.height()/4,125))
         # Bets
-        self.gameNameLabel = self.CreateSimpleText("Paid drinks:", 24)
+        self.gameNameLabel = self.CreateSimpleText("Paid drinks", 24)
         self.gameNameLabel.setPos(self.Scene.width()/2,self.Scene.height() + 75); 
         self.AnimationEngine.addAnimation(QtTrajectory.SlowingLinearPath(self.gameNameLabel,0, -3*self.Scene.height()/5-75,125))
 
@@ -178,7 +178,7 @@ class Ui_QtMainScreen(DynamicWidget):
         self.AnimationEngine.addAnimation(QtTrajectory.SlowingLinearPath(self.RaceLink,-self.outerColumns,0,125))
         # Players
         self.PlayersLabel = self.CreateSimpleText("Players", 24)
-        self.PlayersLabel.setPos(self.Scene.width()+50,2*self.Scene.height()/5); # Players
+        self.PlayersLabel.setPos(self.Scene.width()+50,self.Scene.height()/5); # Players
         self.AnimationEngine.addAnimation(QtTrajectory.SlowingLinearPath(self.PlayersLabel,-self.outerColumns,0,125))
 
 
@@ -198,12 +198,12 @@ class Ui_QtMainScreen(DynamicWidget):
         self.horses = {}
 
     def _DisplayHorses(self, horses):
-        #self.ClearHorses()
+        # self.ClearHorses()
 
         for horse in horses:
             if not horse in self.horses.keys():
                 horseLabel = self.CreateSimpleText(horse, 18)
-                horseLabel.setPos(self.outerColumns, 2*self.Scene.height()/5+45*(len(self.horses)+1))
+                horseLabel.setPos(self.outerColumns, self.Scene.height()/5+45*(len(self.horses)+1))
                 self.horses[horse] = horseLabel
 
     def SetHorses(self, horses, header):
@@ -217,7 +217,7 @@ class Ui_QtMainScreen(DynamicWidget):
         self.players = {}
 
     def _DisplayPlayers(self, players):
-        #self.ClearPlayers()
+        # self.ClearPlayers()
 
         # TODO: Click to kick
         for player, standing, id in players:
@@ -225,7 +225,7 @@ class Ui_QtMainScreen(DynamicWidget):
                 # Create Label
                 playerLabel = self.CreateSimpleText("{0} ({1})".format(player,standing), 18)
                 playerLabel.id = id
-                playerLabel.setPos(self.Scene.width() - self.outerColumns, 2*self.Scene.height()/5+45*(len(self.players)+1))
+                playerLabel.setPos(self.Scene.width() - self.outerColumns, self.Scene.height()/5+45*(len(self.players)+1))
                 self.players[player] = playerLabel
 
     def SetPlayers(self, players, header):
@@ -241,7 +241,7 @@ class Ui_QtMainScreen(DynamicWidget):
         self.drinks = {}
 
     def _DisplayDrinks(self, drinks):
-        #self.ClearDrinks()
+        # self.ClearDrinks()
         
         for fromUserId, toUserId, drink, id in drinks:
             if not id in self.drinks.keys():

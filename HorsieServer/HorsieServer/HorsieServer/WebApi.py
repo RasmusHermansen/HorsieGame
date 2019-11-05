@@ -63,12 +63,12 @@ def CloseSession():
     return jsonify({'Closed': True})
 
 def GenerateHorseKnots():
-    Knot1 = random.normalvariate(9,1.5)
+    Knot1 = random.normalvariate(12,2)
     Knot2 = random.normalvariate(8,1.5)
     Knot3 = random.normalvariate(7,1.5)
     Knot4 = random.normalvariate(8,1.5)
     Knot5 = random.normalvariate(10,1.5)
-    Knot6 = random.normalvariate(14,4)
+    Knot6 = random.normalvariate(14,3)
     return [Knot1, Knot2, Knot3, Knot4, Knot5, Knot6]
 
 def GetHorseClass(currentClasses):
@@ -103,7 +103,7 @@ def SetHorses():
             for i in range(0,desiredHorses - numberHorses):
                 horseClass = GetHorseClass(currentHorses)
                 db.execute('INSERT INTO Horses (SessionId, Name, HorseClass, Knot1, Knot2, Knot3, Knot4, Knot5, Knot6, ProbAction1, ProbAction2, Odds) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)', 
-	                            [request.json['sessionId'], horseClass, horseClass] + GenerateHorseKnots() + ["0","0","5"])
+	                            [request.json['sessionId'], horseClass, horseClass] + GenerateHorseKnots() + ["0","0", str(desiredHorses)])
                 db.commit()
                 currentHorses.append(horseClass)
             changed = True

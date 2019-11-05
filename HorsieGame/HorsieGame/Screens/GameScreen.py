@@ -27,14 +27,18 @@ class Ui_QtGameScreen(DynamicWidget):
         # Instantiate horses
         self.HorseEntities = []
 
+        # shuffle horses
+        random.shuffle(horses)
         for i, horsie in enumerate(horses):
             knotvalues = [horsie['Knot1'],horsie['Knot2'],horsie['Knot3'],horsie['Knot4'],horsie['Knot5'],horsie['Knot1']]
+            # Add stochasticity to each knot (Not same winner)
+            knotvalues = [random.normalvariate(knot,2) for knot in knotvalues]
             horse = QtHorse(horsie['Name'], horsie['id'],knotPoints,knotvalues, self.Scene)
             self.HorseEntities.append(horse)
-            horse.Obj.setPos(0, round(0.6*self.Scene.height()) + i*25)
+            horse.Obj.setPos(0, round(0.5*self.Scene.height()) + i*50)
 
     def _constructBackground(self):
-        self.BackGroundSpeed = -0.1*self.UpdateSpeed
+        self.BackGroundSpeed = -0.15*self.UpdateSpeed
 
         pen = QPen()
         # Earth
@@ -165,6 +169,8 @@ class Ui_QtGameScreen(DynamicWidget):
                     # red
                     redColor = QColor(225,0,0)
                     self.FinishLineWidget = self.Scene.addRect(self.Scene.width(),round(0.6*self.Scene.height()),3,round(0.4*self.Scene.height()),pen,redColor)
+                    self.FinishLineWidget.setZValue(self.HorseEntities[0].Obj.zValue())
+                    self.FinishLineWidget.stackBefore(self.HorseEntities[0].Obj)
                     self.FinishLineActive = True
                     self._onFinishLineActive()
                     self.HorsesFinished = {}
@@ -174,7 +180,7 @@ class Ui_QtGameScreen(DynamicWidget):
 
     def _GrapFinishLinePhoto(self):
         # target rect
-        targetRect = self.FinishLineWidget.rect().adjusted(-300,-60, 50,-75)
+        targetRect = self.FinishLineWidget.rect().adjusted(-550,-100, -10,-25)
         self.FinishLinePhotos.append(self.MainView.grab(targetRect.toRect()))
 
         if(len(self.FinishLinePhotos) > 200/self.UpdateSpeed and len(self.HorsesFinished) == 0):

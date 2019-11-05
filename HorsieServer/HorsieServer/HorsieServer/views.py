@@ -1,4 +1,5 @@
 from HorsieServer.Setup import app, request, render_template, session, flash, redirect, url_for, socketio
+from HorsieServer.HorseClasses import HorseClasses
 from flask_socketio import join_room, leave_room, emit
 import HorsieServer.db as database
 import datetime, random, string
@@ -51,6 +52,27 @@ def Game():
             error="A user already has that Alias(Username) in that Session"
     return render_template('Game.html')
 
+def UpdateOddsByBet(roomId, betValue):
+    # Randomly determine whether to trigger update on '1' but always trigger on 5
+    if (betValue == 5 or betValue > random.uniform(0,3)):
+        # Compute new odds
+        db = database.get_db()
+        # Get all bets
+        bets = db.cursor().execute('SELECT HorseId, Amount FROM Bets WHERE SessionId=?',[roomId]).fetchall()
+        horses = dict.fromkeys(set([bet['HorseId'] for bet in bets]), 0)
+
+        for bet in bets:
+            horses[bet['HorseId']] += bet['Amount']
+
+        total = sum([v for k, v in horses.items()])
+
+        for k, v in horses.items():
+            # TODO: Some sigmoid based system instead? & Add odds for hoses not bet on?
+            db.cursor().execute('UPDATE Horses SET Odds=? WHERE SessionId=? AND id=?',[ max(total/(v+1),15), roomId, k])
+        db.commit()
+
+        # Broadcast new odds
+        BroadCastOddsChanged(roomId)
 
 @socketio.on('Bet')
 def AcceptBet(data):
@@ -78,6 +100,9 @@ def AcceptBet(data):
             # Update the users saldo information
             ProvideSaldoInformation()
             socketio.send("Bet registered.")
+
+            # Update Odds
+            UpdateOddsByBet(session['SessionId'], amount)
         else:
             socketio.send("Bet not registered: you are poor.")
     else:
@@ -140,7 +165,13 @@ def BroadCastBettingDisabled(roomId):
 
 # Move below functions into DB ?
 def GetRelevantHorsesData(roomId):
-    return [dict(x) for x in database.get_db().cursor().execute('SELECT id, Name FROM Horses WHERE SessionId=?',[roomId]).fetchall()]
+    horses = [dict(x) for x in database.get_db().cursor().execute('SELECT id, Name FROM Horses WHERE SessionId=?',[roomId]).fetchall()]
+    # rough af
+    for horserow in horses:
+        for horse in HorseClasses:
+            if horserow['Name'] == horse['Name']:
+                horserow['icon'] = horse['Icon']
+    return horses
 
 def GetReleveantOddsData(roomId):
     return [dict(x) for x in database.get_db().cursor().execute('SELECT id, Odds FROM Horses WHERE SessionId=?',[roomId]).fetchall()]
