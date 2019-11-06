@@ -259,7 +259,7 @@ class Ui_QtMainScreen(DynamicWidget):
             if not id in self.drinks.keys():
                 fromUser = self._GetPlayerAlias(fromUserId)
                 toUser = self._GetPlayerAlias(toUserId)
-                DrinkLabel = self.CreateRemoveableText("{0}->{1} ({2})".format(fromUser, toUser, drink), 18, lambda id=id: self.clearADrink.emit(id))
+                DrinkLabel = self.CreateRemoveableText("{2} gifted to {1} by {0}".format(fromUser, toUser, self.GetDrinkLabel(drink)), 18, lambda id=id: self.clearADrink.emit(id))
                 # Find insertion point
                 p = 0
                 while p in occupiedPositions:
@@ -269,6 +269,13 @@ class Ui_QtMainScreen(DynamicWidget):
                 occupiedPositions.append(p)
                 self.drinks[id] = DrinkLabel
     
+    def GetDrinkLabel(self, drink):
+        if drink == 1:
+            return "sip"
+        if drink == 3:
+            return "shot"
+        return "beer"
+
     def SetDrinks(self, drinks, header, dealtDrinkFunc):
         fromUserIdx = header.index("FromUserId");
         toUserIdx = header.index("ToUserId");
