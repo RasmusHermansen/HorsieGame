@@ -68,7 +68,7 @@ def UpdateOddsByBet(roomId, betValue):
 
         for k, v in horses.items():
             # TODO: Some sigmoid based system instead? & Add odds for hoses not bet on?
-            db.cursor().execute('UPDATE Horses SET Odds=? WHERE SessionId=? AND id=?',[ max(total/(v+1),15), roomId, k])
+            db.cursor().execute('UPDATE Horses SET Odds=? WHERE SessionId=? AND id=?',[ min(1 + total/(v+1),15), roomId, k])
         db.commit()
 
         # Broadcast new odds
@@ -95,7 +95,7 @@ def AcceptBet(data):
             # Register bet
             db = database.get_db()
             db.execute('INSERT INTO Bets (SessionId, UserId, HorseId, Odds, Amount, Handled) VALUES (?,?,?,?,?,?)', 
-	                        [session['SessionId'], id, horseId,  odds, amount, False])
+	                        [session['SessionId'], id, horseId,  max(odds,1), amount, False])
             db.commit()
             # Update the users saldo information
             ProvideSaldoInformation()
@@ -179,7 +179,6 @@ def GetReleveantOddsData(roomId):
 def GetRelevantPlayersData(roomId):
     return [dict(x) for x in database.get_db().cursor().execute('SELECT id, Alias FROM Users WHERE SessionId=?',[roomId]).fetchall()]
 
-
 def GetUserStandingByAlias(sessionId, alias):
     return database.get_db().cursor().execute('SELECT Standing FROM Users WHERE SessionId=? AND Alias=?',[sessionId,alias]).fetchone()[0]
 
@@ -192,3 +191,11 @@ def UpdateUserStanding(sessionId, id, change, current = None):
         current = GetUserStandingByID(sessionId, id)
     db.cursor().execute("UPDATE Users SET Standing = ? WHERE SessionId=? AND id=?",[current + change,sessionId,id])
     db.commit()
+    
+def HalfOdds(roomId): 
+    odds = GetReleveantOddsData(roomId)
+    db = database.get_db()
+    for horse in odds:
+        db.cursor().execute('UPDATE Horses SET Odds=? WHERE SessionId=? AND id=?',[ horse['Odds']/2.5, roomId, horse['id'] ])
+    db.commit()
+    BroadCastOddsChanged(roomId)

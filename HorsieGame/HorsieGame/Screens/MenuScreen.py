@@ -13,6 +13,7 @@ class widgetMode(Enum):
 
 class Ui_QtMainScreen(DynamicWidget):
     startNewSession = pyqtSignal();
+    reconnectLastSession = pyqtSignal();
     startNewGame = pyqtSignal();
     addAHorse = pyqtSignal();
     refreshHorses = pyqtSignal();
@@ -57,6 +58,14 @@ class Ui_QtMainScreen(DynamicWidget):
         label.setPos(-100,-100) 
         return label
 
+    def CreateRemoveableText(self, text, fontsize, fire):
+        font = QtGui.QFont()
+        font.setBold(True)
+        font.setPointSize(fontsize)
+        label = QtLinkText.QtRemoveableText(self.Scene, text, fire, font)
+        label.setPos(-100,-100) 
+        return label
+
     def __InitializeBackground(self):
         #Set background
         self.backGround = QtStaticImg.QtStaticImage()
@@ -85,15 +94,32 @@ class Ui_QtMainScreen(DynamicWidget):
             self.AnimationEngine.addAnimationSequence([initAnim, loopAnim])
 #endregion
 
+    def DisplayUrl(self, url):
+        if "localhost" in url:
+            import socket
+            ipv4 = socket.gethostbyname(socket.gethostname())
+            hostname = ipv4 + ":" + url[-4:]
+        else:
+            hostname = url
+        self.connectToLabel = self.CreateSimpleText("Connect to:", 26)
+        self.connectToLabel.setPos(self.Scene.width() - 200,50);
+        self.addressLabel = self.CreateSimpleText(hostname, 22)
+        self.addressLabel.setPos(self.Scene.width() - 200,90);
+
+
 #region WelcomeScreen
     def _SetAsWelcome(self):
         # Loop welcome assets in
+        self.restartLink = self.CreateLinkText("Reconnect to last game", 26, self.ReconnectLastSession)
+        self.restartLink.setPos(self.Scene.width()/2,self.Scene.height() + 25);
+        self.AnimationEngine.addAnimation(QtTrajectory.SlowingLinearPath(self.restartLink,0,-self.Scene.height()/2.75,250))
         self.welcomeLink = self.CreateLinkText("Start a Game", 32, self.EstablishNewSession)
         self.welcomeLink.setPos(self.Scene.width()/2,-10);
         self.AnimationEngine.addAnimation(QtTrajectory.SlowingLinearPath(self.welcomeLink,0,self.Scene.height()/2.75,250))
         self.welcomeHeadline = self.CreateSimpleText("Welcome", 48)
         self.welcomeHeadline.setPos(self.Scene.width()/2,-75);
         self.AnimationEngine.addAnimation(QtTrajectory.SlowingLinearPath(self.welcomeHeadline,0,self.Scene.height()/2.75,250))
+
 
     def _ClearWelcomeAssets(self):
         if self.welcomeLink and self.welcomeLink.pos().x() > 0:
@@ -104,6 +130,16 @@ class Ui_QtMainScreen(DynamicWidget):
 
 #region TransitionToMenu
     def EstablishNewSession(self):
+        self.ConnectTransition()
+        # notify that it needs to start new session
+        self.startNewSession.emit();
+
+    def ReconnectLastSession(self):
+        self.ConnectTransition()
+        # notify that it needs to start new session
+        self.reconnectLastSession.emit();
+
+    def ConnectTransition(self):
         self._ClearWelcomeAssets()
         self.LoadingHeadline = self.CreateSimpleText("Loading", 48)
         self.LoadingStatus = self.CreateSimpleText("Establishing connection to the server", 26)
@@ -112,8 +148,6 @@ class Ui_QtMainScreen(DynamicWidget):
         self.LoadingStatus.setPos(self.Scene.width()*1.5,self.Scene.height()/2.75-10);
         self.AnimationEngine.addAnimation(QtTrajectory.LinearMovement(self.LoadingStatus,-self.Scene.width(),0,125));
         self.AnimationEngine.addAnimation(QtTrajectory.LinearMovement(self.LoadingHeadline,-self.Scene.width(),0,125));
-        # notify that it needs to start new session
-        self.startNewSession.emit();
 
     def _ClearTransitionAssets(self):
         if self.LoadingHeadline and self.LoadingHeadline.pos().x() > 0:
@@ -190,16 +224,7 @@ class Ui_QtMainScreen(DynamicWidget):
                 return k
         return "<Unknown>"
 
-    def ClearHorses(self):
-        if hasattr(self,"horses") and self.horses:
-            for k, v in self.horses.items():
-                self.Scene.removeItem(v)
-            
-        self.horses = {}
-
     def _DisplayHorses(self, horses):
-        # self.ClearHorses()
-
         for horse in horses:
             if not horse in self.horses.keys():
                 horseLabel = self.CreateSimpleText(horse, 18)
@@ -210,15 +235,8 @@ class Ui_QtMainScreen(DynamicWidget):
         nameIdx = header.index("Name")
         self._DisplayHorses([horse[nameIdx] for horse in horses])
 
-    def ClearPlayers(self):
-        if hasattr(self,"players") and self.players:
-            for k, v in self.players.items():
-                self.Scene.removeItem(v)
-        self.players = {}
 
     def _DisplayPlayers(self, players):
-        # self.ClearPlayers()
-
         # TODO: Click to kick
         for player, standing, id in players:
             if not player in self.players.keys():
@@ -234,21 +252,21 @@ class Ui_QtMainScreen(DynamicWidget):
         idIdx = header.index("id")
         self._DisplayPlayers([(player[nameIdx], player[standingIdx], player[idIdx]) for player in players])
 
-    def ClearDrinks(self):
-        if hasattr(self,"drinks") and self.drinks:
-            for k, v in self.drinks.items():
-                self.Scene.removeItem(v)
-        self.drinks = {}
-
     def _DisplayDrinks(self, drinks):
-        # self.ClearDrinks()
-        
+        occupiedPositions = [drink.Data for id, drink in self.drinks.items() if not drink.IsCleared]
+
         for fromUserId, toUserId, drink, id in drinks:
             if not id in self.drinks.keys():
                 fromUser = self._GetPlayerAlias(fromUserId)
                 toUser = self._GetPlayerAlias(toUserId)
-                DrinkLabel = self.CreateLinkText("{0}->{1} ({2})".format(fromUser, toUser, drink), 18, lambda: self.clearADrink.emit(id))
-                DrinkLabel.setPos(self.Scene.width()/2, 2*self.Scene.height()/5+45*(len(self.drinks)+1))
+                DrinkLabel = self.CreateRemoveableText("{0}->{1} ({2})".format(fromUser, toUser, drink), 18, lambda id=id: self.clearADrink.emit(id))
+                # Find insertion point
+                p = 0
+                while p in occupiedPositions:
+                    p += 1
+                DrinkLabel.setPos(self.Scene.width()/2, 2*self.Scene.height()/5+45*(p+1))
+                DrinkLabel.Data = p
+                occupiedPositions.append(p)
                 self.drinks[id] = DrinkLabel
     
     def SetDrinks(self, drinks, header, dealtDrinkFunc):

@@ -13,7 +13,7 @@ class Ui_QtGameScreen(DynamicWidget):
         super().__init__("Game")
 
         self.UpdateSpeed = 5; 
-        
+
         self._constructBackground()
         self._constructHorses(horses)
         self._postGameCB = postGameCB
@@ -152,10 +152,12 @@ class Ui_QtGameScreen(DynamicWidget):
                     horse.Finished = True
                     horse.FinishT = self.T
                     self.BackGroundSpeed = 0
+                    if len(self.HorsesFinished) == 1:
+                        self.FirstFinishT = self.T
                     self.HandleHorseFinish(len(self.HorsesFinished), horse.Name)
 
             # Check if all horses crossed finishline
-            if len(self.HorsesFinished) == len(self.HorseEntities):
+            if len(self.HorsesFinished) == len(self.HorseEntities) or self.T > self.FirstFinishT + 1000:
                     self.timer.stop()
                     self._DisplayWinningPhoto()
                     self._CreateReturnToMenuButton()
@@ -174,6 +176,7 @@ class Ui_QtGameScreen(DynamicWidget):
                     self.FinishLineActive = True
                     self._onFinishLineActive()
                     self.HorsesFinished = {}
+                    self.FirstFinishT = 10*self.T  # Upper bound
                     # Start Capture Finish line
                     self.FinishLinePhotos = []
                     self.timer.timeout.connect(self._GrapFinishLinePhoto)

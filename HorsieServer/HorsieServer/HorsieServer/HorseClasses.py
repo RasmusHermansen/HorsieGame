@@ -10,6 +10,8 @@ HorseClasses = [
 	 "Icon":"Donald Trav.png"},
 	{"Name":"Klov Klux Klan",
 	 "Icon":"Klov Klux Klan.png"},
+	{"Name":"HeztBollah",
+	 "Icon":"HeztBollah.png"},
 	{"Name":"XenoHorse",
 	 "Icon":"XenoHorse.png"},
  	{"Name":"Basic",

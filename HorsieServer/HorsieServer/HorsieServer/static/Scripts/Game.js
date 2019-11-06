@@ -33,9 +33,9 @@ function SetPlayers(players, socket) {
         $("#people").append(
             `<li class="list-group-item-drink" id="li-${player.id}">
             <span class="Player-Alias">${player.Alias}</span>
-            <button id="btn-drink-large-${player.id}" type="button" class="btn btn-secondary btn-drink pull-right">5 Beer</button>
-            <button id="btn-drink-medium-${player.id}" type="button" class="btn btn-secondary btn-drink pull-right">3 Shot</button>
-            <button id="btn-drink-small-${player.id}" type="button" class="btn btn-secondary btn-drink pull-right">1 Sip</button></li>`)
+            <button id="btn-drink-large-${player.id}" type="button" class="btn btn-secondary btn-drink pull-right">Beer (5)</button>
+            <button id="btn-drink-medium-${player.id}" type="button" class="btn btn-secondary btn-drink pull-right">Shot (3)</button>
+            <button id="btn-drink-small-${player.id}" type="button" class="btn btn-secondary btn-drink pull-right">Sip (1)</button></li>`)
         $(`#btn-drink-large-${player.id}`).click(function () {
             GiveDrink(player.id, 5, socket)
         });

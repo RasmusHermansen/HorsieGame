@@ -1,6 +1,8 @@
 from .Connection import ServerConnection
+import os
 
 class Querier():
+    __tempSessionStorage = os.path.join(os.path.dirname(os.path.realpath(__file__)),"tmp")
     _sessId = -1
     _sessKey = ""
 
@@ -11,11 +13,21 @@ class Querier():
     def IsInstantiated(self):
         return self._sessId != -1
 
+    def TryInstantiateOldSession(self):
+        oldConn = self.RecoverConn()
+        print(oldConn)
+        self._sessKey = oldConn[0]
+        self._sessId = oldConn[1]
+        return oldConn[2]
+
     def InstantiateNewSession(self):
         r = self.conn.PostRequest("CreateSession", None)
         data = r.json()
         self._sessKey = data['sessionKey']
         self._sessId = data['uniqueId']
+
+        # dump connection
+        self.DumpConn([self._sessKey, self._sessId, data['sessionName']])
         return data['sessionName']
 
     def GetPlayers(self):
@@ -48,3 +60,18 @@ class Querier():
     def DisableBetting(self):
         assert self.IsInstantiated(), "Query attempted without an instantiated session"
         self.conn.PostRequest("DisableBetting", {'sessionId':self._sessId,'sessionKey':self._sessKey})
+
+    def RaceStarting(self):
+        assert self.IsInstantiated(), "Query attempted without an instantiated session"
+        self.conn.PostRequest("RaceStarting", {'sessionId':self._sessId,'sessionKey':self._sessKey})
+
+    # Reconnect dump read
+    def DumpConn(self, data):
+        with open(self.__tempSessionStorage, 'w') as f:
+            f.writelines([str(dat) + " \n" for dat in data])
+
+    def RecoverConn(self):
+        with open(self.__tempSessionStorage, 'r') as f:
+            content = f.readlines()
+        return [x.strip() for x in content]
+

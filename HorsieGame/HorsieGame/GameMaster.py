@@ -1,6 +1,6 @@
 from Databinding.Connection import ServerConnection
 from Databinding.Querier import Querier
-import sys, os, threading
+import sys, os, threading, time
 from AudioPlayer import AudioPlayer
 from GameSettings import GameSettings as Settings
 from PyQt5.QtWidgets import QWidget, QMainWindow, QLabel, QGridLayout, QSizePolicy
@@ -52,6 +52,7 @@ class GameMaster(QMainWindow):
         self.MenuWidget = MenuScreen.Ui_QtMainScreen();
         self.MenuWidget.SetMode(MenuScreen.widgetMode.WelcomeScreen)
         self.MenuWidget.startNewSession.connect(self.InitConnection);
+        self.MenuWidget.reconnectLastSession.connect(self.InitLastConnection);
         # Set as central widget
         self.setCentralWidget(self.MenuWidget.getWidget())       
 
@@ -60,6 +61,11 @@ class GameMaster(QMainWindow):
         self.SetToLoading()
         self.LoadingWidget.ChangeStatus("Connecting to server")
         self.worker = RunThread(self._InitConnection,self._InitConnectionCB)
+
+    def InitLastConnection(self):
+        self.SetToLoading()
+        self.LoadingWidget.ChangeStatus("Connecting to server")
+        self.worker = RunThread(self._InitLastConnection,self._InitConnectionCB)
 
     # The callback for _InitConnection
     def _InitConnectionCB(self, _InitConnectionResults):
@@ -85,6 +91,10 @@ class GameMaster(QMainWindow):
     def _InitConnection(self):
         conn = Querier(ServerConnection(Settings().Url))
         return conn, conn.InstantiateNewSession()
+
+    def _InitLastConnection(self):
+        conn = Querier(ServerConnection(Settings().Url))
+        return conn, conn.TryInstantiateOldSession()
 
     def AddOrRemoveHorses(self, count):
         if(not hasattr(self,"Horses")):
@@ -131,8 +141,6 @@ class GameMaster(QMainWindow):
             header = list(self.Drinks[0].keys())
             data = [list(x.values()) for x in self.Drinks]
             self.MenuWidget.SetDrinks(data, header, self.ClearDrink)
-        else:
-            self.MenuWidget.ClearDrinks()
 
     def ClearDrink(self, drinkId):
         print("Clearing drink:{0}".format(drinkId))
@@ -149,6 +157,7 @@ class GameMaster(QMainWindow):
         self.MenuWidget.removeAHorse.connect(self.RemoveOneHorse)
         self.MenuWidget.clearADrink.connect(self.ClearDrink)
         self.MenuWidget.startNewGame.connect(self.StartGame)
+        self.MenuWidget.DisplayUrl(Settings().Url)
         # Start refreshing players & Populate horse table
         self._updateFuncs.append(self.app.processEvents)
         self._updateFuncs.append(self.GetPlayers)
@@ -157,11 +166,21 @@ class GameMaster(QMainWindow):
         self.setCentralWidget(self.MenuWidget.getWidget())
 #endregion 
 
+
 #region GameScreen
     def StartGame(self):
         # Set loading widget
-        #self.SetToLoading()
-        #self.LoadingWidget.ChangeStatus("Feeding Horses (Doing Nothing)")
+        self.SetToLoading()
+        self.worker = RunThread(self.RaceStarting, self._StartGameCB)
+
+    def RaceStarting(self):
+        self.LoadingWidget.ChangeStatus("ODDS DECREASING")
+        time.sleep(2)
+        self.LoadingWidget.ChangeStatus("Feeding Horses")
+        self.conn.RaceStarting()
+        time.sleep(1)
+
+    def _StartGameCB(self):
         self.app.processEvents()
         self.GameWidget = GameScreen.Ui_QtGameScreen(self.PostGame, self.Horses, self.DisableBetting)
         self.setCentralWidget(self.GameWidget.getWidget())

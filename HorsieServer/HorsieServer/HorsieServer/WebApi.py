@@ -1,5 +1,5 @@
 from HorsieServer.Setup import app, request, abort, socketio
-from HorsieServer.views import BroadCastHorsesChanged, UpdateUserStanding, BroadCastRaceOver, BroadCastBettingDisabled
+from HorsieServer.views import BroadCastHorsesChanged, UpdateUserStanding, BroadCastRaceOver, BroadCastBettingDisabled, HalfOdds
 from HorsieServer.HorseClasses import HorseClasses
 import HorsieServer.db as database
 import datetime, random, string
@@ -183,6 +183,15 @@ def DisableBetting():
         SetBettingState(False, sessId)
 
         BroadCastBettingDisabled(sessId)
+
+        return jsonify({'Handled':True})
+
+@app.route('/Game/api/v1.0/RaceStarting', methods=['GET','POST'])
+def RaceStarting():
+    if(_ValidRequest(request)):
+        sessId = request.json['sessionId']
+
+        HalfOdds(sessId)
 
         return jsonify({'Handled':True})
 

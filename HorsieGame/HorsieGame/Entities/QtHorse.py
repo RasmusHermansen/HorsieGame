@@ -30,6 +30,7 @@ class QtHorse(Horse):
             "Ленин лошадь": ["Assets/Horses/LeninHorse.png",304,250],
             "Klov Klux Klan": ["Assets/Horses/Klov Klux Klan.png",300,265],
             "XenoHorse": ["Assets/Horses/XenoHorse.png",336,177],
+            "HeztBollah": ["Assets/Horses/Heztbollah.png",305,234],
             "Donald Trav": ["Assets/Horses/Donald Trav.png",304,244]
         }
         return horses[horseName]

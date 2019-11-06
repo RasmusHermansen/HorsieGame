@@ -173,7 +173,8 @@ body {
 }
 
 .horse-icon {
-    border-radius:50%;
+    border-radius:0.25em;
+    border: thin solid black;
     height:4em;
     width:4em;
 }
