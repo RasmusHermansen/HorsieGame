@@ -6,3 +6,7 @@ runtime_config:
 
 network:
   session_affinity: true
+
+instance_class: F1
+automatic_scaling:
+  max_num_instances: 1
