@@ -3,7 +3,6 @@ from HorsieServer.views import BroadCastHorsesChanged, UpdateUserStanding, Broad
 from HorsieServer.HorseClasses import HorseClasses
 import HorsieServer.db as database
 import datetime, random, string
-from scipy import interpolate
 from flask import jsonify
 
 
