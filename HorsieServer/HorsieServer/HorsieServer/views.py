@@ -2,7 +2,7 @@ from HorsieServer.Setup import app, request, render_template, session, flash, re
 from HorsieServer.HorseClasses import HorseClasses
 from flask_socketio import join_room, leave_room, emit
 import HorsieServer.db as database
-import datetime, random, string
+import datetime, random, string, math
 from flask import jsonify
 
 #TODO:
@@ -57,18 +57,26 @@ def UpdateOddsByBet(roomId, betValue):
     if (betValue == 5 or betValue > random.uniform(0,3)):
         # Compute new odds
         db = database.get_db()
+        
         # Get all bets
         bets = db.cursor().execute('SELECT HorseId, Amount FROM Bets WHERE SessionId=?',[roomId]).fetchall()
-        horses = dict.fromkeys(set([bet['HorseId'] for bet in bets]), 0)
 
+        # Get NumberOfHorses
+        horsesAndOdds = db.cursor().execute('SELECT id, Odds FROM Horses Where SessionId=?',[roomId]).fetchall()
+        horses = dict.fromkeys(set([horse['id'] for horse in horsesAndOdds]), 0)
+
+        total = 0
         for bet in bets:
             horses[bet['HorseId']] += bet['Amount']
+            total += bet['Amount']
 
-        total = sum([v for k, v in horses.items()])
-
+        sumOfOdds = sum([horse['Odds'] for horse in horsesAndOdds])
+        # Transform into sigmoid values
+        mean = total/len(horses)
+        horses = {k: 1/(1+math.exp(0.25*(v-mean))) for k, v in horses.items()}
+        scaling = sumOfOdds/sum([v for k, v in horses.items()])
         for k, v in horses.items():
-            # TODO: Some sigmoid based system instead? & Add odds for hoses not bet on?
-            db.cursor().execute('UPDATE Horses SET Odds=? WHERE SessionId=? AND id=?',[ min(1 + total/(v+1),15), roomId, k])
+            db.cursor().execute('UPDATE Horses SET Odds=? WHERE SessionId=? AND id=?',[ max(min(v*scaling,15),1), roomId, k])
         db.commit()
 
         # Broadcast new odds
@@ -192,10 +200,10 @@ def UpdateUserStanding(sessionId, id, change, current = None):
     db.cursor().execute("UPDATE Users SET Standing = ? WHERE SessionId=? AND id=?",[current + change,sessionId,id])
     db.commit()
     
-def HalfOdds(roomId): 
+def AdjustOdds(roomId, scale): 
     odds = GetReleveantOddsData(roomId)
     db = database.get_db()
     for horse in odds:
-        db.cursor().execute('UPDATE Horses SET Odds=? WHERE SessionId=? AND id=?',[ horse['Odds']/2.5, roomId, horse['id'] ])
+        db.cursor().execute('UPDATE Horses SET Odds=? WHERE SessionId=? AND id=?',[ horse['Odds']*scale, roomId, horse['id'] ])
     db.commit()
     BroadCastOddsChanged(roomId)

@@ -1,5 +1,5 @@
 from HorsieServer.Setup import app, request, abort, socketio
-from HorsieServer.views import BroadCastHorsesChanged, UpdateUserStanding, BroadCastRaceOver, BroadCastBettingDisabled, HalfOdds
+from HorsieServer.views import BroadCastHorsesChanged, UpdateUserStanding, BroadCastRaceOver, BroadCastBettingDisabled, AdjustOdds
 from HorsieServer.HorseClasses import HorseClasses
 import HorsieServer.db as database
 import datetime, random, string
@@ -157,7 +157,7 @@ def ReportResults():
         db = database.get_db()
         # Get unhandled all bets
         bets = db.cursor().execute('SELECT UserId, HorseId, Odds, Amount FROM Bets WHERE SessionId=? AND Handled=?',[sessId,False]).fetchall()
-    
+
         # Make all unhandled bets handled
         db.execute('UPDATE Bets SET Handled=? WHERE SessionId=?', [True,sessId])
         db.commit()
@@ -168,6 +168,9 @@ def ReportResults():
                 UpdateUserStanding(sessId, row['UserId'], row['Odds']*row['Amount'])
 
         BroadCastRaceOver(sessId, request.json['results'][:3])
+        
+        # Rescale Odds
+        AdjustOdds(sessId, 2)
 
         # Re-enable betting
         SetBettingState(True, sessId)
@@ -190,7 +193,7 @@ def RaceStarting():
     if(_ValidRequest(request)):
         sessId = request.json['sessionId']
 
-        HalfOdds(sessId)
+        AdjustOdds(sessId, 0.5)
 
         return jsonify({'Handled':True})
 
