@@ -143,8 +143,10 @@ class GameMaster(QMainWindow):
             self.MenuWidget.SetDrinks(data, header)
 
     def ClearDrink(self, drinkId):
-        print("Clearing drink:{0}".format(drinkId))
         self.worker = RunThread(lambda: self.conn.DealDrink(drinkId))
+
+    def GrantPlayerFunds(self, playerId, amount):
+        self.worker = RunThread(lambda: self.conn.GrantPlayerFunds(playerId, amount))
 
     def SetToMenu(self):
         self.MenuWidget = MenuScreen.Ui_QtMainScreen();
@@ -157,6 +159,7 @@ class GameMaster(QMainWindow):
         self.MenuWidget.removeAHorse.connect(self.RemoveOneHorse)
         self.MenuWidget.clearADrink.connect(self.ClearDrink)
         self.MenuWidget.startNewGame.connect(self.StartGame)
+        self.MenuWidget.grantPlayerFunds.connect(self.GrantPlayerFunds)
         self.MenuWidget.DisplayUrl(Settings().Url)
         # Start refreshing players & Populate horse table
         self._updateFuncs.append(self.app.processEvents)

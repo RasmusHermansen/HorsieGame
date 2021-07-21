@@ -19,6 +19,7 @@ class Ui_QtMainScreen(DynamicWidget):
     refreshHorses = pyqtSignal();
     removeAHorse = pyqtSignal();
     clearADrink = pyqtSignal(int);
+    grantPlayerFunds = pyqtSignal(int, int);
 
     def __init__(self):
         super().__init__("Main")
@@ -241,7 +242,7 @@ class Ui_QtMainScreen(DynamicWidget):
         for player, standing, id in players:
             if not player in self.players.keys():
                 # Create Label
-                playerLabel = self.CreateSimpleText("{0} ({1})".format(player,standing), 18)
+                playerLabel = self.CreateLinkText("{0} ({1})".format(player,standing), 18, lambda id=id: self.grantPlayerFunds.emit(id, 5))
                 playerLabel.id = id
                 playerLabel.setPos(self.Scene.width() - self.outerColumns, self.Scene.height()/5+45*(len(self.players)+1))
                 self.players[player] = playerLabel

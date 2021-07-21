@@ -49,6 +49,10 @@ class Querier():
         r = self.conn.PostRequest("SetHorses", {'sessionId':self._sessId,'sessionKey':self._sessKey,'horsesCount':count})
         return r.json()
 
+    def GrantPlayerFunds(self, playerId, funds):
+        assert self.IsInstantiated(), "Query attempted without an instantiated session"
+        r = self.conn.PostRequest("AdjustPlayerFunds", {'sessionId':self._sessId,'sessionKey':self._sessKey, 'userId':playerId, 'amount':funds})
+
     def CloseSession(self):
         assert self.IsInstantiated(), "Query attempted without an instantiated session"
         self.conn.PostRequest("CloseSession", {'sessionId':self._sessId,'sessionKey':self._sessKey})

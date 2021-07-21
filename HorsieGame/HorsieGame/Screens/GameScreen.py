@@ -31,7 +31,7 @@ class Ui_QtGameScreen(DynamicWidget):
         # shuffle horses
         random.shuffle(horses)
         for i, horsie in enumerate(horses):
-            knotvalues = [horsie['Knot1'],horsie['Knot2'],horsie['Knot3'],horsie['Knot4'],horsie['Knot5'],horsie['Knot1']]
+            knotvalues = [horsie['Knot1'],horsie['Knot2'],horsie['Knot3'],horsie['Knot4'],horsie['Knot5'],horsie['Knot6']]
             # Add stochasticity to each knot (Not same winner)
             knotvalues = [random.normalvariate(knot,2) for knot in knotvalues]
             horse = QtHorse(horsie['Name'], horsie['id'],knotPoints,knotvalues, self.Scene)
@@ -159,7 +159,7 @@ class Ui_QtGameScreen(DynamicWidget):
                     self.HandleHorseFinish(len(self.HorsesFinished), horse.Name)
 
             # Check if all horses crossed finishline
-            if len(self.HorsesFinished) == len(self.HorseEntities) or self.T > self.FirstFinishT + 1000:
+            if len(self.HorsesFinished) == len(self.HorseEntities) or self.T > self.FirstFinishT + 500:
                     self.timer.stop()
                     self._DisplayWinningPhoto()
                     self._CreateReturnToMenuButton()

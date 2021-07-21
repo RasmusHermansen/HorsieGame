@@ -193,18 +193,18 @@ def RaceStarting():
     if(_ValidRequest(request)):
         sessId = request.json['sessionId']
 
-        AdjustOdds(sessId, 0.5)
+        AdjustOdds(sessId, 0.25)
 
         return jsonify({'Handled':True})
 
-@app.route('/Game/api/v1.0/AddPlayerFunds', methods=['GET','POST'])
+@app.route('/Game/api/v1.0/AdjustPlayerFunds', methods=['GET','POST'])
 def AddPlayerFunds():
     if(_ValidRequest(request)):
         sessId = request.json['sessionId']
         userId = request.json['userId']
         amount = request.json['amount']
 
-        UpdateUserStanding(sessId, row['UserId'], row['Odds']*row['Amount'])
+        UpdateUserStanding(sessId, userId, amount)
         return jsonify({'Handled':True})
 
 def SetBettingState(state, sessId):
