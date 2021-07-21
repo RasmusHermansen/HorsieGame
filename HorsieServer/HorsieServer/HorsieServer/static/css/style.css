@@ -193,6 +193,9 @@ body {
     padding-right: 1em;
     margin-bottom: 0.5em;
     display: block;
+    position: sticky;
+    top: 0px;
+    z-index: 999;
 }
 
 .pull-right {
