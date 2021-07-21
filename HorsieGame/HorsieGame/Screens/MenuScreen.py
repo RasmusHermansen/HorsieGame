@@ -276,7 +276,7 @@ class Ui_QtMainScreen(DynamicWidget):
             return "shot"
         return "beer"
 
-    def SetDrinks(self, drinks, header, dealtDrinkFunc):
+    def SetDrinks(self, drinks, header):
         fromUserIdx = header.index("FromUserId");
         toUserIdx = header.index("ToUserId");
         drinkIdx = header.index("Drink")

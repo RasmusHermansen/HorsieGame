@@ -31,7 +31,7 @@ class QtLinkText(QtSimpleText):
         self.onClick = onClick;
 
     def mousePressEvent(self, QGraphicsSceneMouseEvent):
-        self.onClick();
+        self.onClick()
         return super().mousePressEvent(QGraphicsSceneMouseEvent)
 
     def hoverEnterEvent(self, QGraphicsSceneHoverEvent):
@@ -51,7 +51,6 @@ class QtRemoveableText(QtLinkText):
         super().__init__(scene, text, onClick, font, centered, **kwargs)
 
     def mousePressEvent(self, QGraphicsSceneMouseEvent):
-        self.onClick();
         self.scene().removeItem(self)
         self.IsCleared = True
         return super().mousePressEvent(QGraphicsSceneMouseEvent)

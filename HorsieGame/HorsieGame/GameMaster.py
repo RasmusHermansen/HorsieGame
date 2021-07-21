@@ -140,7 +140,7 @@ class GameMaster(QMainWindow):
         if self.Drinks: # <-- True if not empty
             header = list(self.Drinks[0].keys())
             data = [list(x.values()) for x in self.Drinks]
-            self.MenuWidget.SetDrinks(data, header, self.ClearDrink)
+            self.MenuWidget.SetDrinks(data, header)
 
     def ClearDrink(self, drinkId):
         print("Clearing drink:{0}".format(drinkId))
