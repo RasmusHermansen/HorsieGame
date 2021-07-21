@@ -14,18 +14,17 @@ class AudioPlayer(object, metaclass=Singleton.Singleton):
     TrackLibrary = {};
     EffectsLibrary = {};
 
-    def __init__(self, startSong = None):
+    def __init__(self):
         # Load resource
         self._PreloadResources();
-        # Choose first song
-        self.SetBackgroundTrack(startSong);
 
     def SetBackgroundTrack(self, song):
-        if(self.CurrentTrack != "" and self.CurrentTrack != song):
-            self.TrackLibrary[self.CurrentTrack].stop()
-        if(GameSettings().PlayMusic and song in self.TrackLibrary.keys()):
-            self.TrackLibrary[song].play();
-            self.CurrentTrack = song;
+        if self.CurrentTrack != song:
+            if(self.CurrentTrack != ""):
+                self.TrackLibrary[self.CurrentTrack].stop()
+            if(GameSettings().PlayMusic and song in self.TrackLibrary.keys()):
+                self.TrackLibrary[song].play();
+                self.CurrentTrack = song;
 
     def PlayEffect(self, effect):
         if(GameSettings().PlayEffects and effect in self.EffectsLibrary.keys()):

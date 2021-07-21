@@ -164,6 +164,8 @@ class GameMaster(QMainWindow):
         self._updateFuncs.append(self.GetDrinks)
         self.PopulateHorseTable()
         self.setCentralWidget(self.MenuWidget.getWidget())
+        AudioPlayer().SetBackgroundTrack('Nature')
+
 #endregion 
 
 
@@ -185,7 +187,6 @@ class GameMaster(QMainWindow):
         self.GameWidget = GameScreen.Ui_QtGameScreen(self.PostGame, self.Horses, self.DisableBetting)
         self.setCentralWidget(self.GameWidget.getWidget())
         self.app.processEvents()
-        AudioPlayer().SetBackgroundTrack('LoneRanger');
         self.timer.stop()
         self.GameWidget.RunGame()
         
@@ -228,9 +229,7 @@ class GameMaster(QMainWindow):
         family = QFontDatabase().applicationFontFamilies(fontId)[0]
         MainFont = QFont(family)
         self.app.setFont(MainFont)
-        
-        # Initialize media player
-        self.Audio = AudioPlayer('WindBlowing');
+        AudioPlayer().SetBackgroundTrack('Nature')
 
     def closeEvent(self, event):
         if(hasattr(self,"conn") and (self.conn != None)):

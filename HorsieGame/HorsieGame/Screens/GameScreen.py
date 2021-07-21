@@ -4,6 +4,7 @@ from Screens.BasicWidget import DynamicWidget
 from Entities.QtHorse import QtHorse
 from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import QColor, QPen
+from AudioPlayer import AudioPlayer
 from GameSettings import GameSettings as Settings
 import random
 
@@ -87,6 +88,7 @@ class Ui_QtGameScreen(DynamicWidget):
         font = QtGui.QFont()
         font.setBold(True)
         if(place == 1):
+            AudioPlayer().SetBackgroundTrack('ChampagneGalloppen');
             color = QColor(255, 215, 0)
             displacement = 0
             font.setPointSize(72)
@@ -202,6 +204,7 @@ class Ui_QtGameScreen(DynamicWidget):
 
     def RunGame(self):
         self.MainView.show() 
+        AudioPlayer().SetBackgroundTrack('LoneRanger');
         self.StartTimer(self.UpdateSpeed);
 
     def getWidget(self):
