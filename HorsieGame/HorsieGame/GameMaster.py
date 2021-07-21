@@ -114,7 +114,7 @@ class GameMaster(QMainWindow):
         self.AddOrRemoveHorses(len(self.Horses)+1)
 
     def RemoveOneHorse(self):
-        self.AddOrRemoveHorses(min(len(self.Horses)-1,1))
+        self.AddOrRemoveHorses(max(len(self.Horses)-1,1))
     
     def PopulateHorseTable(self):
         if self.Horses:
@@ -218,6 +218,8 @@ class GameMaster(QMainWindow):
             self.move(300,300);
         else:
             self.showFullScreen()
+            Settings().Height = self.size().height()
+            Settings().Width = self.size().width()
         # Set window title
         self.setWindowTitle('HorsieGame')
         # Set Icon
