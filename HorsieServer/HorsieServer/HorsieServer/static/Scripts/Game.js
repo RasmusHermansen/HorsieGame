@@ -1,5 +1,3 @@
-
-
 function SetHorses(horses, socket) {
     $("#horses").empty()
     horses.forEach(function (horse) {
@@ -19,11 +17,6 @@ function SetHorses(horses, socket) {
         $(`#btn-bet-small-${horse.id}`).click(function () {
             BetOnHorse(horse.id, 1, socket)
         });
-    });
-    Sortable.create(document.getElementById('horses'), {
-        animation: 100,
-        draggable: '.list-group-item',
-        handle: '.list-group-item'
     });
 }
 
@@ -45,11 +38,6 @@ function SetPlayers(players, socket) {
         $(`#btn-drink-small-${player.id}`).click(function () {
             GiveDrink(player.id, 1, socket)
         });
-    });
-    Sortable.create(document.getElementById('people'), {
-        animation: 100,
-        draggable: '.list-group-item-drink',
-        handle: '.list-group-item-drink'
     });
 }
 
