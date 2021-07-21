@@ -36,7 +36,7 @@ class Ui_QtGameScreen(DynamicWidget):
             knotvalues = [random.normalvariate(knot,2) for knot in knotvalues]
             horse = QtHorse(horsie['Name'], horsie['id'],knotPoints,knotvalues, self.Scene)
             self.HorseEntities.append(horse)
-            horse.Obj.setPos(0, round(0.5*self.Scene.height()) + i*50)
+            horse.Obj.setPos(0, round(0.55*self.Scene.height()) + i*50)
 
     def _constructBackground(self):
         self.BackGroundSpeed = -0.15*self.UpdateSpeed
